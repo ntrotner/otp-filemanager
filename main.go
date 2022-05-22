@@ -1,20 +1,13 @@
 package main
 
 import (
-	"os"
+	"otp-filemanager/helper"
 	http_api "otp-filemanager/http-api"
-
-	"github.com/joho/godotenv"
+	permission_controller "otp-filemanager/permission-controller"
 )
 
 func main() {
-	port := readEnv()
+	port, id_seed, issuer, period := helper.ReadEnv()
+	permission_controller.InitializeOTPGenerator(id_seed, issuer, period)
 	http_api.InitializeHTTPServer(port)
-}
-
-func readEnv() *string {
-	godotenv.Load(".env")
-
-	port := os.Getenv("HTTPPORT")
-	return &port
 }

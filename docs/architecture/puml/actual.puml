@@ -7,26 +7,45 @@ annotation content-modifier {
 +ReadFile()
 +DeleteFile()
 +ReadIdentity()
-+WriteIdentity()
++WriteIdentity(identity *User_otp): error
 +DeleteIdentity()
+}
+class User_otp {
++Id: string
++Key: Key
+
+}
+}
+package helper{
+annotation helper {
+
+
+-getPort(): *string
+-getIssuer(): *string
+-getPeriod(): *uint
+-getIDSeed(): *uint64
++ReadEnv(): *string, *uint64, *string, *uint
 }
 }
 package http-api{
 annotation http-api {
 
 
++OTPHandler()
 +InitializeHTTPServer(port *string)
 }
 }
 package permission-controller{
 annotation permission-controller {
 
-
+-var id_generator: *Shortid
+-var otp_opts: GenerateOpts
 +ChallengeReadFile()
 +ChallengeWriteFile()
 +ChallengeDeleteFile()
 +ChallengeDeleteIdentity()
-+CreateIdentity()
++InitializeOTPGenerator(seed *uint64, issuer *string, period *uint)
++CreateIdentity(): *User_otp, error
 }
 }
 package .{
@@ -34,7 +53,6 @@ annotation . {
 
 
 -main()
--readEnv(): *string
 }
 }
 
