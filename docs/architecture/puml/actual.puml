@@ -1,0 +1,19 @@
+@startuml
+package content-modifier{
+annotation content-modifier {
+
+
++WriteFile(): int
++WriteIdentity(): int
+}
+}
+package .{
+annotation . {
+
+
+-main()
+}
+}
+
+
+@enduml
