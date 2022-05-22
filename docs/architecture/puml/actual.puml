@@ -3,8 +3,30 @@ package content-modifier{
 annotation content-modifier {
 
 
-+WriteFile(): int
-+WriteIdentity(): int
++WriteFile()
++ReadFile()
++DeleteFile()
++ReadIdentity()
++WriteIdentity()
++DeleteIdentity()
+}
+}
+package http-api{
+annotation http-api {
+
+
++InitializeHTTPServer(port *string)
+}
+}
+package permission-controller{
+annotation permission-controller {
+
+
++ChallengeReadFile()
++ChallengeWriteFile()
++ChallengeDeleteFile()
++ChallengeDeleteIdentity()
++CreateIdentity()
 }
 }
 package .{
@@ -12,6 +34,7 @@ annotation . {
 
 
 -main()
+-readEnv(): *string
 }
 }
 
