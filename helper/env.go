@@ -27,7 +27,7 @@ func getIssuer() *string {
 }
 
 func getPeriod() *uint {
-	period, err := strconv.ParseUint(os.Getenv("PERIOD"), 10, 64)
+	period, err := strconv.ParseUint(os.Getenv("PERIOD"), 10, 32)
 	var u_period uint
 
 	if err != nil {
