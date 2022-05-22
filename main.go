@@ -1,7 +1,20 @@
 package main
 
-import "fmt"
+import (
+	"os"
+	http_api "otp-filemanager/http-api"
+
+	"github.com/joho/godotenv"
+)
 
 func main() {
-	fmt.Println("Hello World")
+	port := readEnv()
+	http_api.InitializeHTTPServer(port)
+}
+
+func readEnv() *string {
+	godotenv.Load(".env")
+
+	port := os.Getenv("HTTPPORT")
+	return &port
 }
