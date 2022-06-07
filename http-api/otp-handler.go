@@ -47,41 +47,43 @@ func OTPHandler() {
 		responder.Send()
 	})
 
-	http.HandleFunc("/challengeLogin", func(w http.ResponseWriter, r *http.Request) {
-		query := r.URL.Query()
+	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		// get username and password
-		id := query.Get("id")
-		clientOverlappingCode := query.Get("otp")
+		id, clientOverlappingCode, ok := r.BasicAuth()
 
-		log.Println("Client:", id)
+		if ok {
+			log.Println("Client:", id)
 
-		foundID, err := idmanager.ExistsIdentity(&id)
+			foundID, err := idmanager.ExistsIdentity(&id)
 
-		if err != nil {
-			w.WriteHeader(500)
-			w.Write([]byte("Identity wasn't found"))
-			log.Println("Invalid Identity", id)
-			return
+			if err != nil {
+				w.WriteHeader(401)
+				w.Write([]byte("Identity wasn't found"))
+				log.Println("Invalid Identity", id)
+				return
+			}
+			validCode, err := totp.ValidateCustom(clientOverlappingCode, foundID.Key.Secret(), time.Now(), permissioncontroller.ValidateOtpOpts)
+
+			if err != nil {
+				w.WriteHeader(500)
+				w.Write([]byte("Identity unresponsive"))
+				log.Println("Identity unresponsive", id)
+				log.Println(err)
+				return
+			}
+
+			if validCode {
+				w.WriteHeader(200)
+				w.Header().Set("Content-Type", "application/json")
+				w.Write([]byte(fmt.Sprintln(foundID.Files)))
+				log.Println("Login Successful", id)
+			} else {
+				w.WriteHeader(401)
+				w.Write([]byte("Access Denied"))
+				log.Println("Login Failed", id)
+			}
 		}
-		validCode, err := totp.ValidateCustom(clientOverlappingCode, foundID.Key.Secret(), time.Now(), permissioncontroller.ValidateOtpOpts)
-
-		if err != nil {
-			w.WriteHeader(500)
-			w.Write([]byte("Identity unresponsive"))
-			log.Println("Identity unresponsive", id)
-			log.Println(err)
-			return
-		}
-
-		if validCode {
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json")
-			w.Write([]byte(fmt.Sprintln(foundID.Files)))
-			log.Println("Login Successful", id)
-		} else {
-			w.WriteHeader(400)
-			w.Write([]byte("Access Denied"))
-			log.Println("Login Failed", id)
-		}
+		w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 	})
 }
