@@ -1,5 +1,9 @@
 package permission_controller
 
+func ChallengeLogin(id *string) {
+
+}
+
 func ChallengeReadFile() {
 }
 
