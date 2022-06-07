@@ -1,11 +1,10 @@
 package http_api
 
 import (
-	"bytes"
 	"fmt"
-	"image/png"
 	"log"
 	"net/http"
+	otpresponder "otp-filemanager/http-api/otp-identity-responder"
 	permissioncontroller "otp-filemanager/permission-controller"
 	idmanager "otp-filemanager/permission-controller/id-manager"
 	"time"
@@ -17,6 +16,9 @@ import (
 func OTPHandler() {
 	// handle creation of a new identity
 	http.HandleFunc("/createIdentity", func(w http.ResponseWriter, r *http.Request) {
+		query := r.URL.Query()
+		// see otpresponder for all "resp" possibilities
+		mode := otpresponder.IdentityResponse(query.Get("resp"))
 		// create new random identity
 		newUser, err := permissioncontroller.CreateIdentity()
 
@@ -26,28 +28,23 @@ func OTPHandler() {
 			return
 		}
 
-		// create qr code image
-		image, err := newUser.Key.Image(128*3, 128*3)
+		var responder otpresponder.IdentityResponder
+		responderTool := otpresponder.IdentityResponderTool{NewUser: newUser, HttpResponder: &w}
 
-		if err != nil {
-			w.WriteHeader(500)
-			w.Write([]byte("Couldn't show QR code"))
-			return
+		// select mode of response by the use of "resp", whereas default is plain text
+		switch mode {
+		case otpresponder.QR:
+			responder = otpresponder.QRCodeResponder{Tool: responderTool}
+			break
+		case otpresponder.Combination:
+			responder = otpresponder.CombinedResponder{Tool: responderTool}
+			break
+		case otpresponder.Url:
+		default:
+			responder = otpresponder.UrlResponder{Tool: responderTool}
 		}
 
-		// convert image to bytes in a buffer
-		buf := new(bytes.Buffer)
-		err = png.Encode(buf, image)
-
-		if err != nil {
-			w.WriteHeader(500)
-			w.Write([]byte("QR code encoding failed"))
-			return
-		}
-
-		// send bytes
-		w.Header().Set("Content-Type", "image/png")
-		w.Write(buf.Bytes())
+		responder.Send()
 	})
 
 	http.HandleFunc("/challengeLogin", func(w http.ResponseWriter, r *http.Request) {
