@@ -2,9 +2,15 @@ package http_api
 
 import (
 	"bytes"
+	"fmt"
 	"image/png"
+	"log"
 	"net/http"
-	permission_controller "otp-filemanager/permission-controller"
+	permissioncontroller "otp-filemanager/permission-controller"
+	idmanager "otp-filemanager/permission-controller/id-manager"
+	"time"
+
+	"github.com/pquerna/otp/totp"
 )
 
 // initialize otp related endpoints
@@ -12,7 +18,7 @@ func OTPHandler() {
 	// handle creation of a new identity
 	http.HandleFunc("/createIdentity", func(w http.ResponseWriter, r *http.Request) {
 		// create new random identity
-		new_user, err := permission_controller.CreateIdentity()
+		newUser, err := permissioncontroller.CreateIdentity()
 
 		if err != nil {
 			w.WriteHeader(500)
@@ -21,7 +27,7 @@ func OTPHandler() {
 		}
 
 		// create qr code image
-		image, err := new_user.Key.Image(128*3, 128*3)
+		image, err := newUser.Key.Image(128*3, 128*3)
 
 		if err != nil {
 			w.WriteHeader(500)
@@ -44,4 +50,41 @@ func OTPHandler() {
 		w.Write(buf.Bytes())
 	})
 
+	http.HandleFunc("/challengeLogin", func(w http.ResponseWriter, r *http.Request) {
+		query := r.URL.Query()
+		// get username and password
+		id := query.Get("id")
+		clientOverlappingCode := query.Get("otp")
+
+		log.Println("Client:", id)
+
+		foundID, err := idmanager.ExistsIdentity(&id)
+
+		if err != nil {
+			w.WriteHeader(500)
+			w.Write([]byte("Identity wasn't found"))
+			log.Println("Invalid Identity", id)
+			return
+		}
+		validCode, err := totp.ValidateCustom(clientOverlappingCode, foundID.Key.Secret(), time.Now(), permissioncontroller.ValidateOtpOpts)
+
+		if err != nil {
+			w.WriteHeader(500)
+			w.Write([]byte("Identity unresponsive"))
+			log.Println("Identity unresponsive", id)
+			log.Println(err)
+			return
+		}
+
+		if validCode {
+			w.WriteHeader(200)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte(fmt.Sprintln(foundID.Files)))
+			log.Println("Login Successful", id)
+		} else {
+			w.WriteHeader(400)
+			w.Write([]byte("Access Denied"))
+			log.Println("Login Failed", id)
+		}
+	})
 }
