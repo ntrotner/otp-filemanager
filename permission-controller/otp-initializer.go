@@ -1,7 +1,9 @@
 package permission_controller
 
 import (
-	content_modifier "otp-filemanager/content-modifier"
+	"log"
+	contentmodifier "otp-filemanager/content-modifier"
+	idmanager "otp-filemanager/permission-controller/id-manager"
 
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
@@ -9,15 +11,17 @@ import (
 )
 
 var (
-	id_generator *shortid.Shortid
-	otp_opts     totp.GenerateOpts
+	idGenerator     *shortid.Shortid
+	GenerateOtpOpts totp.GenerateOpts
+	ValidateOtpOpts totp.ValidateOpts
 )
 
-// create worker for generating identities and default options for otp
+// InitializeOTPGenerator create worker for generating identities and default options for otp
 func InitializeOTPGenerator(seed *uint64, issuer *string, period *uint) {
-	id_generator, _ = shortid.New(1, shortid.DefaultABC, *seed)
+	idmanager.InitializeIDManager()
+	idGenerator, _ = shortid.New(1, shortid.DefaultABC, *seed)
 
-	otp_opts = totp.GenerateOpts{
+	GenerateOtpOpts = totp.GenerateOpts{
 		Issuer:      *issuer,
 		AccountName: "",
 		Period:      *period,
@@ -27,35 +31,48 @@ func InitializeOTPGenerator(seed *uint64, issuer *string, period *uint) {
 		Algorithm:   otp.AlgorithmSHA1,
 		Rand:        nil,
 	}
+
+	ValidateOtpOpts = totp.ValidateOpts{
+		Period:    *period,
+		Digits:    otp.DigitsEight,
+		Algorithm: otp.AlgorithmSHA1,
+	}
 }
 
 // create new random identity
-func CreateIdentity() (*content_modifier.User_otp, error) {
+func CreateIdentity() (*contentmodifier.UserOtp, error) {
 	// create new identity
-	new_id, err := id_generator.Generate()
-
+	newId, err := idGenerator.Generate()
 	if err != nil {
 		return nil, err
+	}
+
+	// check if identity exist and fail if it does
+	userOtp, err := idmanager.ExistsIdentity(&newId)
+	if err == nil {
+		return userOtp, err
 	}
 
 	// copy default options and adjust name of new account
-	otp_user_opts := otp_opts
-	otp_user_opts.AccountName = new_id
+	otpUserOpts := GenerateOtpOpts
+	otpUserOpts.AccountName = newId
 
 	// generate otp key
-	key, _ := totp.Generate(otp_user_opts)
+	key, _ := totp.Generate(otpUserOpts)
 
-	new_user := content_modifier.User_otp{
-		Id:  new_id,
-		Key: *key,
+	newUser := contentmodifier.UserOtp{
+		Id:    newId,
+		Key:   *key,
+		Files: []string{},
 	}
 
 	// save new identity
-	err = content_modifier.WriteIdentity(&new_user)
+	err = idmanager.CreateIdentity(&newId, &newUser)
 
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 
-	return &new_user, nil
+	return &newUser, nil
 }
