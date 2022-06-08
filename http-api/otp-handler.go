@@ -2,6 +2,7 @@ package http_api
 
 import (
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	otpresponder "otp-filemanager/http-api/otp-identity-responder"
@@ -14,6 +15,17 @@ import (
 
 // initialize otp related endpoints
 func OTPHandler() {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		tmpl := template.Must(template.ParseFiles("html-templates/home.gohtml"))
+		err := tmpl.Execute(w, nil)
+
+		if err != nil {
+			w.WriteHeader(500)
+			w.Write([]byte("Couldn't build HTML"))
+			return
+		}
+	})
+
 	// handle creation of a new identity
 	http.HandleFunc("/createIdentity", func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query()
@@ -65,7 +77,7 @@ func OTPHandler() {
 			validCode, err := totp.ValidateCustom(clientOverlappingCode, foundID.Key.Secret(), time.Now(), permissioncontroller.ValidateOtpOpts)
 
 			if err != nil {
-				w.WriteHeader(500)
+				w.WriteHeader(401)
 				w.Write([]byte("Identity unresponsive"))
 				log.Println("Identity unresponsive", id)
 				log.Println(err)
@@ -77,10 +89,12 @@ func OTPHandler() {
 				w.Header().Set("Content-Type", "application/json")
 				w.Write([]byte(fmt.Sprintln(foundID.Files)))
 				log.Println("Login Successful", id)
+				return
 			} else {
 				w.WriteHeader(401)
 				w.Write([]byte("Access Denied"))
 				log.Println("Login Failed", id)
+				return
 			}
 		}
 		w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
