@@ -7,10 +7,7 @@ import (
 	"net/http"
 	otpresponder "otp-filemanager/http-api/otp-identity-responder"
 	permissioncontroller "otp-filemanager/permission-controller"
-	idmanager "otp-filemanager/permission-controller/id-manager"
 	"time"
-
-	"github.com/pquerna/otp/totp"
 )
 
 // initialize otp related endpoints
@@ -64,27 +61,13 @@ func OTPHandler() {
 		id, clientOverlappingCode, ok := r.BasicAuth()
 
 		if ok {
+			currentTime := time.Now()
 			log.Println("Client:", id)
 
-			foundID, err := idmanager.ExistsIdentity(&id)
+			// check if user exists and code is valid
+			foundID, err := permissioncontroller.ChallengeLogin(&id, &clientOverlappingCode, &currentTime)
 
 			if err != nil {
-				w.WriteHeader(401)
-				w.Write([]byte("Identity wasn't found"))
-				log.Println("Invalid Identity", id)
-				return
-			}
-			validCode, err := totp.ValidateCustom(clientOverlappingCode, foundID.Key.Secret(), time.Now(), permissioncontroller.ValidateOtpOpts)
-
-			if err != nil {
-				w.WriteHeader(401)
-				w.Write([]byte("Identity unresponsive"))
-				log.Println("Identity unresponsive", id)
-				log.Println(err)
-				return
-			}
-
-			if validCode {
 				w.WriteHeader(200)
 				w.Header().Set("Content-Type", "application/json")
 				w.Write([]byte(fmt.Sprintln(foundID.Files)))
