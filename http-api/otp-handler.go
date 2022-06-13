@@ -5,8 +5,11 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	content_modifier "otp-filemanager/content-modifier"
+	"otp-filemanager/helper"
 	otpresponder "otp-filemanager/http-api/otp-identity-responder"
 	permissioncontroller "otp-filemanager/permission-controller"
+	"path"
 	"time"
 )
 
@@ -68,15 +71,18 @@ func OTPHandler() {
 			foundID, err := permissioncontroller.ChallengeLogin(&id, &clientOverlappingCode, &currentTime)
 
 			if err != nil {
-				w.WriteHeader(200)
-				w.Header().Set("Content-Type", "application/json")
-				w.Write([]byte(fmt.Sprintln(foundID.Files)))
-				log.Println("Login Successful", id)
-				return
-			} else {
 				w.WriteHeader(401)
 				w.Write([]byte("Access Denied"))
 				log.Println("Login Failed", id)
+				return
+			} else {
+				pathToFilesOfFoundID := path.Join(content_modifier.PathToFilesOfIdentities, foundID.Id)
+				files := helper.ReadFileNamesOfDirectory(&pathToFilesOfFoundID)
+
+				w.WriteHeader(200)
+				w.Header().Set("Content-Type", "application/json")
+				w.Write([]byte(fmt.Sprintln(files)))
+				log.Println("Login Successful", id)
 				return
 			}
 		}
