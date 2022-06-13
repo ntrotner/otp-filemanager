@@ -5,15 +5,13 @@ import (
 )
 
 type UserOtp struct {
-	Id    string
-	Key   otp.Key
-	Files []string
+	Id  string
+	Key otp.Key
 }
 
 type FilesystemUserOtp struct {
-	URL_Key     string   `json:"url"`
-	Issued_Date string   `json:"date"`
-	Files       []string `json:"files"`
+	URL_Key     string `json:"url"`
+	Issued_Date string `json:"date"`
 }
 
 type LoginChallenge struct {

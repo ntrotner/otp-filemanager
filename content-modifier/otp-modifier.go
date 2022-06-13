@@ -71,7 +71,6 @@ func ReadIdentity(id *string) (*UserOtp, error) {
 		return &parsedUser, err
 	}
 
-	parsedUser.Files = readUser.Files
 	parsedUser.Key = *otpKey
 	parsedUser.Id = *id
 
@@ -83,7 +82,6 @@ func WriteIdentity(id *string, identity *UserOtp) error {
 	fsUser := FilesystemUserOtp{
 		URL_Key:     identity.Key.URL(),
 		Issued_Date: time.Now().String(),
-		Files:       identity.Files,
 	}
 
 	file, err := json.MarshalIndent(fsUser, "", " ")

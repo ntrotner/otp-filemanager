@@ -61,9 +61,8 @@ func CreateIdentity() (*contentmodifier.UserOtp, error) {
 	key, _ := totp.Generate(otpUserOpts)
 
 	newUser := contentmodifier.UserOtp{
-		Id:    newId,
-		Key:   *key,
-		Files: []string{},
+		Id:  newId,
+		Key: *key,
 	}
 
 	// save new identity
