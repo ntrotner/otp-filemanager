@@ -35,7 +35,6 @@ func ReadAllIdentities() *map[string]*UserOtp {
 	for _, element := range fileInfos {
 		userId := helper.FilenameWithoutExtension(element.Name())
 		parsedUser, err := ReadIdentity(&userId)
-		log.Println(parsedUser)
 
 		if err != nil {
 			continue
@@ -71,8 +70,6 @@ func ReadIdentity(id *string) (*UserOtp, error) {
 		log.Println(err)
 		return &parsedUser, err
 	}
-
-	log.Println(otpKey.URL())
 
 	parsedUser.Files = readUser.Files
 	parsedUser.Key = *otpKey
