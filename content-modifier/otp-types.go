@@ -1,8 +1,21 @@
 package content_modifier
 
-import "github.com/pquerna/otp"
+import (
+	"github.com/pquerna/otp"
+)
 
-type User_otp struct {
-	Id  string
-	Key otp.Key
+type UserOtp struct {
+	Id    string
+	Key   otp.Key
+	Files []string
+}
+
+type FilesystemUserOtp struct {
+	URL_Key     string   `json:"url"`
+	Issued_Date string   `json:"date"`
+	Files       []string `json:"files"`
+}
+
+type LoginChallenge struct {
+	Files []string `json:"files"`
 }

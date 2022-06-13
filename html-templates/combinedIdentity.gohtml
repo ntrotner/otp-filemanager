@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>New OTP Identity</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            text-align: center;
+        }
+
+        .identity-qr, .identity-url {
+            width: min-content;
+            margin: 0 auto;
+        }
+
+        .identity-ref {
+            max-width: 368px;
+        }
+
+        .identity-url {
+            margin-top: 3vh;
+        }
+
+        @media only screen and (max-width: 1024px) {
+            .identity-qr, .identity-url {
+                width: 368px;
+            }
+
+            .identity-ref {
+                overflow-wrap: anywhere;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="identity-qr">
+    <h2 class="identity-title-qr">OTP Code</h2>
+    <img width="368px" height="368px" src="data:image/png;base64,{{.Image}}" alt="Blank"/>
+</div>
+<div class="identity-url">
+    <h2 class="identity-title-url">OTP URL</h2>
+    <a class="identity-ref" href="{{.OtpUrl}}">{{.OtpUrl}}</a>
+</div>
+</body>
+</html>

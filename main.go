@@ -1,13 +1,17 @@
 package main
 
 import (
+	contentmodifier "otp-filemanager/content-modifier"
 	"otp-filemanager/helper"
-	http_api "otp-filemanager/http-api"
-	permission_controller "otp-filemanager/permission-controller"
+	httpapi "otp-filemanager/http-api"
+	permissioncontroller "otp-filemanager/permission-controller"
 )
 
 func main() {
-	port, id_seed, issuer, period := helper.ReadEnv()
-	permission_controller.InitializeOTPGenerator(id_seed, issuer, period)
-	http_api.InitializeHTTPServer(port)
+	port, idSeed, issuer, period := helper.ReadEnv()
+
+	// initialize modules
+	contentmodifier.InitializeOTPModifier()
+	permissioncontroller.InitializeOTPGenerator(idSeed, issuer, period)
+	httpapi.InitializeHTTPServer(port)
 }
