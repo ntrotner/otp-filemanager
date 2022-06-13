@@ -14,6 +14,7 @@ import (
 
 var pathToIdentities = filepath.Join("live-data", "identities")
 
+// InitializeOTPModifier prepares the directory for saving new identities
 func InitializeOTPModifier() {
 	err := helper.CreateDirectory(pathToIdentities)
 	if err != nil {
@@ -22,6 +23,7 @@ func InitializeOTPModifier() {
 	}
 }
 
+// ReadAllIdentities parses all identities in the directory
 func ReadAllIdentities() *map[string]*UserOtp {
 	var otpIdentities = make(map[string]*UserOtp)
 	fileInfos, err := ioutil.ReadDir(pathToIdentities)
@@ -45,6 +47,7 @@ func ReadAllIdentities() *map[string]*UserOtp {
 	return &otpIdentities
 }
 
+// ReadIdentity reads a single identity
 func ReadIdentity(id *string) (*UserOtp, error) {
 	readUser := FilesystemUserOtp{}
 	parsedUser := UserOtp{}
@@ -78,6 +81,7 @@ func ReadIdentity(id *string) (*UserOtp, error) {
 	return &parsedUser, nil
 }
 
+// WriteIdentity creates a new identity file
 func WriteIdentity(id *string, identity *UserOtp) error {
 	fsUser := FilesystemUserOtp{
 		URL_Key:     identity.Key.URL(),
@@ -103,6 +107,7 @@ func WriteIdentity(id *string, identity *UserOtp) error {
 	return err
 }
 
+// DeleteIdentity deletes the file for the identity
 func DeleteIdentity(id *string) error {
 	err := os.Remove(filepath.Join(pathToIdentities, *id+".json"))
 

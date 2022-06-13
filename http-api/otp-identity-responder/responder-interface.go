@@ -14,6 +14,8 @@ const (
 )
 
 type IdentityResponder interface {
+	// Send handles the event of sending the response to the client
+	// while also handling error events
 	Send()
 }
 

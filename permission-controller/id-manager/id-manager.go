@@ -9,10 +9,12 @@ var (
 	existingIDs map[string]*content_modifier.UserOtp
 )
 
+// InitializeIDManager prepares the data structures
 func InitializeIDManager() {
 	existingIDs = *content_modifier.ReadAllIdentities()
 }
 
+// ExistsIdentity check if identity exists
 func ExistsIdentity(id *string) (*content_modifier.UserOtp, error) {
 	user, existsUser := existingIDs[*id]
 
@@ -23,6 +25,7 @@ func ExistsIdentity(id *string) (*content_modifier.UserOtp, error) {
 	return user, errors.New("User couldn't be found")
 }
 
+// CreateIdentity creates new identity in memory and filesystem
 func CreateIdentity(id *string, user_otp *content_modifier.UserOtp) error {
 	err := content_modifier.WriteIdentity(id, user_otp)
 
