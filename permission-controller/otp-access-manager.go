@@ -1,6 +1,7 @@
 package permission_controller
 
 import (
+	"errors"
 	"github.com/pquerna/otp/totp"
 	content_modifier "otp-filemanager/content-modifier"
 	idmanager "otp-filemanager/permission-controller/id-manager"
@@ -15,7 +16,12 @@ func ChallengeLogin(id *string, clientCode *string, time *time.Time) (*content_m
 		return foundID, err
 	}
 
-	_, err = totp.ValidateCustom(*clientCode, foundID.Key.Secret(), *time, ValidateOtpOpts)
+	validPassword, err := totp.ValidateCustom(*clientCode, foundID.Key.Secret(), *time, ValidateOtpOpts)
+
+	if validPassword {
+		return foundID, errors.New("invalid Password")
+	}
+
 	return foundID, err
 }
 
