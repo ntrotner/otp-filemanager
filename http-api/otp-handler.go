@@ -1,13 +1,13 @@
 package http_api
 
 import (
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	content_modifier "otp-filemanager/content-modifier"
 	"otp-filemanager/helper"
 	otpresponder "otp-filemanager/http-api/otp-identity-responder"
+	otp_login_responder "otp-filemanager/http-api/otp-login-responder"
 	permissioncontroller "otp-filemanager/permission-controller"
 	"path"
 	"time"
@@ -60,11 +60,15 @@ func OTPHandler() {
 	})
 
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		query := r.URL.Query()
+		// see loginresponder for all "resp" possibilities
+		mode := otp_login_responder.LoginResponse(query.Get("resp"))
 		// get username and password
 		id, clientOverlappingCode, ok := r.BasicAuth()
 
 		if ok {
 			currentTime := time.Now()
+			log.Println(currentTime)
 			log.Println("Client:", id)
 
 			// check if user exists and code is valid
@@ -79,9 +83,20 @@ func OTPHandler() {
 				pathToFilesOfFoundID := path.Join(content_modifier.PathToFilesOfIdentities, foundID.Id)
 				files := helper.ReadFileNamesOfDirectory(&pathToFilesOfFoundID)
 
-				w.WriteHeader(200)
-				w.Header().Set("Content-Type", "application/json")
-				w.Write([]byte(fmt.Sprintln(files)))
+				var responder otp_login_responder.LoginResponder
+				responderTool := otp_login_responder.LoginResponderTool{User: foundID, HttpResponder: &w, Files: files}
+
+				// select mode of response by the use of "resp", whereas default is a json
+				switch mode {
+				case otp_login_responder.AccountInterface:
+					responder = otp_login_responder.AccountInterfaceResponder{Tool: responderTool}
+					break
+				case otp_login_responder.FileList:
+				default:
+					responder = otp_login_responder.FileListResponder{Tool: responderTool}
+				}
+
+				responder.Send()
 				log.Println("Login Successful", id)
 				return
 			}
