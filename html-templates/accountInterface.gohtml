@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Account Detail</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            text-align: center;
+        }
+
+        .filelist ul {
+            list-style: none;
+        }
+
+        .filelist li, .filelist ul {
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="identity">
+    <h2 class="identity-title-qr">User Account</h2>
+    <p>{{.UserID}}</p>
+</div>
+
+<form action="/download">
+    <div class="filelist">
+        <h2 class="identity-title-qr">Files</h2>
+
+        <select id="files" name="files">
+            {{range .Files}}
+                <option value="{{.}}">{{.}}</option>
+            {{end}}
+        </select>
+    </div>
+
+    <div class="password">
+        <h2 class="identity-title-qr">One Time Password</h2>
+
+        <input type="text" id="otp" name="otp"><br>
+    </div>
+
+
+    <input style="margin-top: 36px;" type="submit" value="Download"/>
+</form>
+
+<script>
+    const id = {{.UserID}};
+    var selectedFile = "";
+
+    function selectFile(input) {
+        console.log(input)
+    }
+</script>
+</body>
+</html>
