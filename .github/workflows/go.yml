@@ -25,4 +25,4 @@ jobs:
       run: go test ./... -v
 
     - name: Lint
-      run: if [[ $(gofmt -l . | wc -l) == 0 ]]; then return 0; else return 1; fi
+      run: if [[ $(gofmt -l . | wc -l) == 0 ]]; then exit 0; else exit 1; fi
