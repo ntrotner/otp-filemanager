@@ -27,14 +27,14 @@ func InitializeOTPGenerator(seed *uint64, issuer *string, period *uint) {
 		Period:      *period,
 		SecretSize:  0,
 		Secret:      nil,
-		Digits:      otp.DigitsEight,
+		Digits:      otp.DigitsSix,
 		Algorithm:   otp.AlgorithmSHA1,
 		Rand:        nil,
 	}
 
 	ValidateOtpOpts = totp.ValidateOpts{
 		Period:    *period,
-		Digits:    otp.DigitsEight,
+		Digits:    otp.DigitsSix,
 		Algorithm: otp.AlgorithmSHA1,
 	}
 }
