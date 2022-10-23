@@ -14,7 +14,7 @@ type AccountInterfaceTemplate struct {
 }
 
 func (r AccountInterfaceResponder) Send() {
-	tmpl := template.Must(template.ParseFiles("html-templates/accountInterface.gohtml"))
+	tmpl := template.Must(template.ParseFiles("http-api/html-templates/accountInterface.gohtml"))
 	err := tmpl.Execute(*r.Tool.HttpResponder, AccountInterfaceTemplate{UserID: r.Tool.User.Id, Files: r.Tool.Files})
 
 	if err != nil {
