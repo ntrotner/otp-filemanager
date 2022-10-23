@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"otp-filemanager/helper"
+	"path"
 	"path/filepath"
 	"time"
 
@@ -110,4 +111,10 @@ func DeleteIdentity(id *string) error {
 		log.Println(err)
 	}
 	return err
+}
+
+// ReadFilesOfIdentity gets list of files related to an id
+func ReadFilesOfIdentity(id *string) []string {
+	pathToFilesOfFoundID := path.Join(PathToFilesOfIdentities, *id)
+	return helper.ReadFileNamesOfDirectory(&pathToFilesOfFoundID)
 }
