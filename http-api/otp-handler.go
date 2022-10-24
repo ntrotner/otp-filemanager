@@ -47,13 +47,9 @@ func OTPHandler() {
 		// see loginresponder for all "resp" possibilities
 		mode := otp_login_responder.LoginResponse(query.Get("resp"))
 		// get username and password
-		id, clientOverlappingCode, ok := r.BasicAuth()
-
-		if !ok {
-			w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
+		r.ParseForm()
+		id := r.FormValue("user")
+		clientOverlappingCode := r.FormValue("password")
 
 		currentTime := time.Now()
 		log.Println(currentTime)

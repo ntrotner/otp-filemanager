@@ -17,9 +17,16 @@
 
 <div>
     <h2>Default OTP File Manager Interface</h2>
-    <button onclick="window.location.href = '/createIdentity?resp=cb';" type="button">Create Account</button>
+    <form action="/login" method="POST">
+        <label for="user">User</label><br>
+        <input type="text" id="user" name="user"><br>
+        <label for="password">Password</label><br>
+        <input type="password" id="password" name="password">
+        <br>
+        <input type="submit" value="Login">
+    </form> 
     <br>
-    <button onclick="window.location.href = '/login';" type="button">Login</button>
+    <button onclick="window.location.href = '/createIdentity?resp=cb';" type="button">Create Account</button>
 </div>
 
 </body>
