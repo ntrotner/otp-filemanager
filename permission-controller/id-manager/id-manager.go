@@ -2,7 +2,7 @@ package id_manager
 
 import (
 	"errors"
-	content_modifier "otp-filemanager/content-modifier"
+	content_modifier "otp-filemanager/permission-controller/id-manager/content-modifier"
 )
 
 var (
@@ -11,6 +11,7 @@ var (
 
 // InitializeIDManager prepares the data structures
 func InitializeIDManager() {
+	content_modifier.InitializeOTPModifier()
 	existingIDs = *content_modifier.ReadAllIdentities()
 }
 
@@ -36,4 +37,8 @@ func CreateIdentity(id *string, user_otp *content_modifier.UserOtp) error {
 	existingIDs[*id] = user_otp
 
 	return nil
+}
+
+func ReadFilesOfIdentity(id *string) []string {
+	return content_modifier.ReadFilesOfIdentity(id)
 }

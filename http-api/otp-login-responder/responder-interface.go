@@ -2,7 +2,7 @@ package otp_login_responder
 
 import (
 	"net/http"
-	content_modifier "otp-filemanager/content-modifier"
+	content_modifier "otp-filemanager/permission-controller/id-manager/content-modifier"
 )
 
 type LoginResponse string

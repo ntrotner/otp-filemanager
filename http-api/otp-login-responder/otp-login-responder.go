@@ -2,11 +2,12 @@ package otp_login_responder
 
 import (
 	"net/http"
-	content_modifier "otp-filemanager/content-modifier"
+	id_manager "otp-filemanager/permission-controller/id-manager"
+	content_modifier "otp-filemanager/permission-controller/id-manager/content-modifier"
 )
 
 func SelectResponder(mode *LoginResponse, foundID *content_modifier.UserOtp, w *http.ResponseWriter) LoginResponder {
-	files := content_modifier.ReadFilesOfIdentity(&foundID.Id)
+	files := id_manager.ReadFilesOfIdentity(&foundID.Id)
 	responderTool := LoginResponderTool{User: foundID, HttpResponder: w, Files: files}
 
 	switch *mode {

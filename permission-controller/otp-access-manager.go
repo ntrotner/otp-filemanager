@@ -2,8 +2,8 @@ package permission_controller
 
 import (
 	"errors"
-	content_modifier "otp-filemanager/content-modifier"
 	idmanager "otp-filemanager/permission-controller/id-manager"
+	content_modifier "otp-filemanager/permission-controller/id-manager/content-modifier"
 	"time"
 
 	"github.com/pquerna/otp/totp"
