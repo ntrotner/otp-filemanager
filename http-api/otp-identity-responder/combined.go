@@ -32,7 +32,7 @@ func (r CombinedResponder) Send() {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("html-templates/combinedIdentity.gohtml"))
+	tmpl := template.Must(template.ParseFiles("http-api/html-templates/combinedIdentity.gohtml"))
 	err = tmpl.Execute(*r.Tool.HttpResponder, CombinedTemplate{OtpUrl: template.URL(url), Image: base64.RawStdEncoding.EncodeToString(buf.Bytes())})
 
 	if err != nil {

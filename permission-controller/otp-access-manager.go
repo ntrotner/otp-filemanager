@@ -1,10 +1,12 @@
 package permission_controller
 
 import (
-	"github.com/pquerna/otp/totp"
-	content_modifier "otp-filemanager/content-modifier"
+	"errors"
 	idmanager "otp-filemanager/permission-controller/id-manager"
+	content_modifier "otp-filemanager/permission-controller/id-manager/content-modifier"
 	"time"
+
+	"github.com/pquerna/otp/totp"
 )
 
 // ChallengeLogin finds user and checks if code is valid
@@ -15,8 +17,13 @@ func ChallengeLogin(id *string, clientCode *string, time *time.Time) (*content_m
 		return foundID, err
 	}
 
-	_, err = totp.ValidateCustom(*clientCode, foundID.Key.Secret(), *time, ValidateOtpOpts)
-	return foundID, err
+	validPassword, _ := totp.ValidateCustom(*clientCode, foundID.Key.Secret(), *time, ValidateOtpOpts)
+
+	if !validPassword {
+		return foundID, errors.New("invalid Password")
+	}
+
+	return foundID, nil
 }
 
 func ChallengeReadFile() {

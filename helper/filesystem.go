@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -17,4 +18,21 @@ func CreateDirectory(folder string) error {
 // FilenameWithoutExtension removes the extension of the filename
 func FilenameWithoutExtension(filename string) string {
 	return strings.TrimSuffix(filename, path.Ext(filename))
+}
+
+// ReadFileNamesOfDirectory returns list of files in a directory without child directories
+func ReadFileNamesOfDirectory(folder *string) []string {
+	fileNames := make([]string, 0)
+
+	files, err := ioutil.ReadDir(*folder)
+	if err != nil {
+		return fileNames
+	}
+
+	for _, file := range files {
+		if !file.IsDir() {
+			fileNames = append(fileNames, file.Name())
+		}
+	}
+	return fileNames
 }

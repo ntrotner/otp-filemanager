@@ -2,8 +2,8 @@ package permission_controller
 
 import (
 	"log"
-	contentmodifier "otp-filemanager/content-modifier"
 	idmanager "otp-filemanager/permission-controller/id-manager"
+	contentmodifier "otp-filemanager/permission-controller/id-manager/content-modifier"
 
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
@@ -27,14 +27,14 @@ func InitializeOTPGenerator(seed *uint64, issuer *string, period *uint) {
 		Period:      *period,
 		SecretSize:  0,
 		Secret:      nil,
-		Digits:      otp.DigitsEight,
+		Digits:      otp.DigitsSix,
 		Algorithm:   otp.AlgorithmSHA1,
 		Rand:        nil,
 	}
 
 	ValidateOtpOpts = totp.ValidateOpts{
 		Period:    *period,
-		Digits:    otp.DigitsEight,
+		Digits:    otp.DigitsSix,
 		Algorithm: otp.AlgorithmSHA1,
 	}
 }
@@ -61,9 +61,8 @@ func CreateIdentity() (*contentmodifier.UserOtp, error) {
 	key, _ := totp.Generate(otpUserOpts)
 
 	newUser := contentmodifier.UserOtp{
-		Id:    newId,
-		Key:   *key,
-		Files: []string{},
+		Id:  newId,
+		Key: *key,
 	}
 
 	// save new identity

@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"otp-filemanager/helper"
+	"path"
 	"path/filepath"
 	"time"
 
@@ -71,7 +72,6 @@ func ReadIdentity(id *string) (*UserOtp, error) {
 		return &parsedUser, err
 	}
 
-	parsedUser.Files = readUser.Files
 	parsedUser.Key = *otpKey
 	parsedUser.Id = *id
 
@@ -83,7 +83,6 @@ func WriteIdentity(id *string, identity *UserOtp) error {
 	fsUser := FilesystemUserOtp{
 		URL_Key:     identity.Key.URL(),
 		Issued_Date: time.Now().String(),
-		Files:       identity.Files,
 	}
 
 	file, err := json.MarshalIndent(fsUser, "", " ")
@@ -112,4 +111,10 @@ func DeleteIdentity(id *string) error {
 		log.Println(err)
 	}
 	return err
+}
+
+// ReadFilesOfIdentity gets list of files related to an id
+func ReadFilesOfIdentity(id *string) []string {
+	pathToFilesOfFoundID := path.Join(PathToFilesOfIdentities, *id)
+	return helper.ReadFileNamesOfDirectory(&pathToFilesOfFoundID)
 }

@@ -1,11 +1,11 @@
 package http_api
 
 import (
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	otpresponder "otp-filemanager/http-api/otp-identity-responder"
+	otp_login_responder "otp-filemanager/http-api/otp-login-responder"
 	permissioncontroller "otp-filemanager/permission-controller"
 	"time"
 )
@@ -13,7 +13,7 @@ import (
 // initialize otp related endpoints
 func OTPHandler() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		tmpl := template.Must(template.ParseFiles("html-templates/home.gohtml"))
+		tmpl := template.Must(template.ParseFiles("http-api/html-templates/home.gohtml"))
 		err := tmpl.Execute(w, nil)
 
 		if err != nil {
@@ -37,50 +37,36 @@ func OTPHandler() {
 			return
 		}
 
-		var responder otpresponder.IdentityResponder
-		responderTool := otpresponder.IdentityResponderTool{NewUser: newUser, HttpResponder: &w}
-
-		// select mode of response by the use of "resp", whereas default is plain text
-		switch mode {
-		case otpresponder.QR:
-			responder = otpresponder.QRCodeResponder{Tool: responderTool}
-			break
-		case otpresponder.Combination:
-			responder = otpresponder.CombinedResponder{Tool: responderTool}
-			break
-		case otpresponder.Url:
-		default:
-			responder = otpresponder.UrlResponder{Tool: responderTool}
-		}
-
+		responder := otpresponder.SelectResponder(&mode, newUser, &w)
 		responder.Send()
 	})
 
+	// handle login of existant user
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		query := r.URL.Query()
+		// see loginresponder for all "resp" possibilities
+		mode := otp_login_responder.LoginResponse(query.Get("resp"))
 		// get username and password
-		id, clientOverlappingCode, ok := r.BasicAuth()
+		r.ParseForm()
+		id := r.FormValue("user")
+		clientOverlappingCode := r.FormValue("password")
 
-		if ok {
-			currentTime := time.Now()
-			log.Println("Client:", id)
+		currentTime := time.Now()
+		log.Println(currentTime)
+		log.Println("Client:", id)
 
-			// check if user exists and code is valid
-			foundID, err := permissioncontroller.ChallengeLogin(&id, &clientOverlappingCode, &currentTime)
+		// check if user exists and code is valid
+		foundID, err := permissioncontroller.ChallengeLogin(&id, &clientOverlappingCode, &currentTime)
 
-			if err != nil {
-				w.WriteHeader(200)
-				w.Header().Set("Content-Type", "application/json")
-				w.Write([]byte(fmt.Sprintln(foundID.Files)))
-				log.Println("Login Successful", id)
-				return
-			} else {
-				w.WriteHeader(401)
-				w.Write([]byte("Access Denied"))
-				log.Println("Login Failed", id)
-				return
-			}
+		if err != nil {
+			w.WriteHeader(401)
+			w.Write([]byte("Access Denied"))
+			log.Println("Login Failed", id)
+			return
 		}
-		w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+
+		responder := otp_login_responder.SelectResponder(&mode, foundID, &w)
+		responder.Send()
+		log.Println("Login Successful", id)
 	})
 }
