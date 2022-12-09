@@ -52,8 +52,6 @@ func OTPHandler() {
 		clientOverlappingCode := r.FormValue("password")
 
 		currentTime := time.Now()
-		log.Println(currentTime)
-		log.Println("Client:", id)
 
 		// check if user exists and code is valid
 		foundID, err := permissioncontroller.ChallengeLogin(&id, &clientOverlappingCode, &currentTime)
@@ -61,12 +59,12 @@ func OTPHandler() {
 		if err != nil {
 			w.WriteHeader(401)
 			w.Write([]byte("Access Denied"))
-			log.Println("Login Failed", id)
+			log.Println("Login Failed", id, "at", currentTime)
 			return
 		}
 
 		responder := otp_login_responder.SelectResponder(&mode, foundID, &w)
 		responder.Send()
-		log.Println("Login Successful", id)
+		log.Println("Login Successful", id, "at", currentTime)
 	})
 }
