@@ -13,11 +13,14 @@ import (
 	"github.com/pquerna/otp"
 )
 
-var pathToIdentities = filepath.Join("live-data", "identities")
-
 // InitializeOTPModifier prepares the directory for saving new identities
 func InitializeOTPModifier() {
-	err := helper.CreateDirectory(pathToIdentities)
+	err := helper.CreateDirectory(PathToIdentities)
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
+	err = helper.CreateDirectory(PathToFilesOfIdentities)
 	if err != nil {
 		log.Println(err)
 		os.Exit(1)
@@ -27,7 +30,7 @@ func InitializeOTPModifier() {
 // ReadAllIdentities parses all identities in the directory
 func ReadAllIdentities() *map[string]*UserOtp {
 	var otpIdentities = make(map[string]*UserOtp)
-	fileInfos, err := ioutil.ReadDir(pathToIdentities)
+	fileInfos, err := ioutil.ReadDir(PathToIdentities)
 	if err != nil {
 		log.Println(err)
 		os.Exit(1)
@@ -51,7 +54,7 @@ func ReadAllIdentities() *map[string]*UserOtp {
 func ReadIdentity(id *string) (*UserOtp, error) {
 	readUser := FilesystemUserOtp{}
 	parsedUser := UserOtp{}
-	byteFile, err := ioutil.ReadFile(filepath.Join(pathToIdentities, *id+".json"))
+	byteFile, err := ioutil.ReadFile(filepath.Join(PathToIdentities, *id+".json"))
 
 	if err != nil {
 		log.Println(err)
@@ -92,10 +95,18 @@ func WriteIdentity(id *string, identity *UserOtp) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(filepath.Join(pathToIdentities, *id+".json"), file, 0644)
+	err = os.WriteFile(filepath.Join(PathToIdentities, *id+".json"), file, 0644)
 
 	if err != nil {
 		log.Println(err)
+		return err
+	}
+
+	err = os.MkdirAll(filepath.Join(PathToFilesOfIdentities, *id), 0755)
+
+	if err != nil {
+		log.Println(err)
+		os.Remove(filepath.Join(PathToIdentities, *id+".json"))
 		return err
 	}
 
@@ -105,11 +116,16 @@ func WriteIdentity(id *string, identity *UserOtp) error {
 
 // DeleteIdentity deletes the file for the identity
 func DeleteIdentity(id *string) error {
-	err := os.Remove(filepath.Join(pathToIdentities, *id+".json"))
-
+	err := os.Remove(filepath.Join(PathToIdentities, *id+".json"))
 	if err != nil {
 		log.Println(err)
 	}
+
+	err = os.Remove(filepath.Join(PathToFilesOfIdentities, *id))
+	if err != nil {
+		log.Println(err)
+	}
+
 	return err
 }
 

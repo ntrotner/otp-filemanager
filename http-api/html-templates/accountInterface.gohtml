@@ -16,6 +16,12 @@
         .filelist li, .filelist ul {
             padding: 0;
         }
+
+        .forms {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+        }
     </style>
 </head>
 <body>
@@ -24,7 +30,9 @@
     <p>{{.UserID}}</p>
 </div>
 
+<div class="forms">
 <form action="/download">
+    <h2>Download</h2>
     <div class="filelist">
         <h2 class="identity-title-qr">Files</h2>
 
@@ -38,12 +46,33 @@
     <div class="password">
         <h2 class="identity-title-qr">One Time Password</h2>
 
-        <input type="text" id="otp" name="otp"><br>
+        <input type="password" id="otp" name="otp"><br>
     </div>
 
 
     <input style="margin-top: 36px;" type="submit" value="Download"/>
+    <input type="hidden" type="text" id="user" name="user" value="{{.UserID}}">
 </form>
+
+<form action="/upload">
+    <h2>Upload</h2>
+    <div class="filelist">
+        <h2 class="identity-title-qr">File</h2>
+
+        <input type="file" id="file" name="file">
+    </div>
+
+    <div class="password">
+        <h2 class="identity-title-qr">One Time Password</h2>
+
+        <input type="password" id="otp" name="otp"><br>
+    </div>
+
+
+    <input style="margin-top: 36px;" type="submit" value="Upload"/>
+    <input type="hidden" type="text" id="user" name="user" value="{{.UserID}}">
+</form>
+</div>
 
 <script>
     const id = {{.UserID}};
