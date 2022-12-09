@@ -2,6 +2,7 @@ package permission_controller
 
 import (
 	"log"
+	"otp-filemanager/helper"
 	idmanager "otp-filemanager/permission-controller/id-manager"
 	contentmodifier "otp-filemanager/permission-controller/id-manager/content-modifier"
 
@@ -16,10 +17,12 @@ var (
 	ValidateOtpOpts totp.ValidateOpts
 )
 
+const SAFE_CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-"
+
 // InitializeOTPGenerator create worker for generating identities and default options for otp
 func InitializeOTPGenerator(seed *uint64, issuer *string, period *uint) {
 	idmanager.InitializeIDManager()
-	idGenerator, _ = shortid.New(1, shortid.DefaultABC, *seed)
+	idGenerator, _ = shortid.New(1, SAFE_CHARACTERS, *seed)
 
 	GenerateOtpOpts = totp.GenerateOpts{
 		Issuer:      *issuer,
@@ -46,6 +49,9 @@ func CreateIdentity() (*contentmodifier.UserOtp, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// modify id created by generator
+	helper.MapUserID(&newId)
 
 	// check if identity exist and fail if it does
 	userOtp, err := idmanager.ExistsIdentity(&newId)
