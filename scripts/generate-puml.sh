@@ -1,3 +1,3 @@
 #!/bin/sh
 
-go-plantuml generate -r -d . -o ./docs/architecture/puml/actual.puml
+go-plantuml generate -r -d . -o ./docs/architecture/actual.puml
