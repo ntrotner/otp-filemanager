@@ -10,4 +10,4 @@
 
 ## Architecture
 
-![Overview](./docs/architecture/actual.png)
+![Overview](./docs/architecture/overview.png)
