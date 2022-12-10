@@ -2,8 +2,11 @@ package permission_controller
 
 import (
 	"errors"
+	"log"
+	"mime/multipart"
 	idmanager "otp-filemanager/permission-controller/id-manager"
 	content_modifier "otp-filemanager/permission-controller/id-manager/content-modifier"
+	"path"
 	"time"
 
 	"github.com/pquerna/otp/totp"
@@ -26,10 +29,30 @@ func ChallengeLogin(id *string, clientCode *string, time *time.Time) (*content_m
 	return foundID, nil
 }
 
-func ChallengeReadFile() {
+func ChallengeReadFile(id *string, clientCode *string, time *time.Time, fileName *string) (*[]byte, error) {
+	foundID, err := ChallengeLogin(id, clientCode, time)
+	if err != nil {
+		log.Println("Error for Read File:", err)
+		return nil, err
+	}
+
+	file, err := content_modifier.ReadFile(path.Join(content_modifier.PathToFilesOfIdentities, foundID.Id, *fileName))
+	if err != nil {
+		log.Println("Error for Read File:", err)
+		return nil, err
+	}
+
+	return file, nil
 }
 
-func ChallengeWriteFile() {
+func ChallengeWriteFile(id *string, clientCode *string, time *time.Time, fileName *string, file *multipart.File) error {
+	foundID, err := ChallengeLogin(id, clientCode, time)
+	if err != nil {
+		return err
+	}
+	err = content_modifier.WriteFile(path.Join(content_modifier.PathToFilesOfIdentities, foundID.Id, *fileName), file)
+
+	return err
 }
 
 func ChallengeDeleteFile() {
