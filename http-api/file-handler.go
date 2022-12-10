@@ -7,10 +7,10 @@ import (
 )
 
 // FileHandler initialize file related endpoints
-func FileHandler() {
+func FileHandler(maxSize *int64) {
 	http.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {
 		// check if user exists and code is valid
-		err := common.ChallengeWriteFileHTTP(r, w)
+		err := common.ChallengeWriteFileHTTP(r, w, maxSize)
 		if err != nil {
 			return
 		}

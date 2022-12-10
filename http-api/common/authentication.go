@@ -61,9 +61,9 @@ func ChallengeReadFileHTTP(request *http.Request, writer http.ResponseWriter) (*
 	return foundFile, nil
 }
 
-func ChallengeWriteFileHTTP(request *http.Request, writer http.ResponseWriter) error {
+func ChallengeWriteFileHTTP(request *http.Request, writer http.ResponseWriter, maxSize *int64) error {
 	// get username and password
-	id, clientOverlappingCode, file, handler, err := SanitizeUploadFile(request)
+	id, clientOverlappingCode, file, handler, err := SanitizeUploadFile(request, maxSize)
 	if err != nil {
 		writer.WriteHeader(401)
 		writer.Write([]byte("Access Denied"))

@@ -41,22 +41,32 @@ func getPeriod() *uint {
 
 func getIDSeed() *uint64 {
 	// parse seed to uint64 for generating identities
-	id_seed, err := strconv.ParseUint(os.Getenv("IDSEED"), 10, 64)
+	idSeed, err := strconv.ParseUint(os.Getenv("IDSEED"), 10, 64)
 
 	if err != nil {
-		id_seed = uint64(42)
+		idSeed = uint64(42)
 	}
-	return &id_seed
+	return &idSeed
+}
+
+func getMaxSize() *int64 {
+	maxSize, err := strconv.ParseInt(os.Getenv("MAXFILESIZEMB"), 10, 64)
+
+	if err != nil {
+		maxSize = int64(10)
+	}
+	return &maxSize
 }
 
 // get required env variables for running the service
-func ReadEnv() (*string, *uint64, *string, *uint) {
+func ReadEnv() (*string, *uint64, *string, *uint, *int64) {
 	godotenv.Load(".env")
 
 	port := getPort()
-	id_seed := getIDSeed()
+	idSeed := getIDSeed()
 	issuer := getIssuer()
 	period := getPeriod()
+	maxSize := getMaxSize()
 
-	return port, id_seed, issuer, period
+	return port, idSeed, issuer, period, maxSize
 }

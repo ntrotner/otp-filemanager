@@ -6,12 +6,12 @@ import (
 )
 
 // start http server to handle requests that relate to backend actions
-func InitializeHTTPServer(port *string) {
+func InitializeHTTPServer(port *string, maxSize *int64) {
 	// initialize otp related endpoints
 	OTPHandler()
 
 	// initialize endpoint to interact with files
-	FileHandler()
+	FileHandler(maxSize)
 
 	// import endpoints not directly related to otp
 	MiscHandler()
