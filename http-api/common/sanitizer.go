@@ -17,6 +17,7 @@ func SanitizeFileName(fileName *string) {
 func SanitizeUploadFile(request *http.Request, maxSize *int64) (string, string, multipart.File, *multipart.FileHeader, error) {
 	request.ParseMultipartForm((2 << 19) * *maxSize)
 	file, header, err := request.FormFile("file")
+	SanitizeFileName(&header.Filename)
 
 	return request.FormValue("user"), request.FormValue("password"), file, header, err
 }
