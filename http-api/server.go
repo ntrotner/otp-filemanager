@@ -10,6 +10,9 @@ func InitializeHTTPServer(port *string) {
 	// initialize otp related endpoints
 	OTPHandler()
 
+	// initialize endpoint to interact with files
+	FileHandler()
+
 	// import endpoints not directly related to otp
 	MiscHandler()
 
