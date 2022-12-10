@@ -7,15 +7,29 @@ annotation helper {
 -getIssuer(): *string
 -getPeriod(): *uint
 -getIDSeed(): *uint64
-+ReadEnv(): *string, *uint64, *string, *uint
+-getMaxSize(): *int64
++ReadEnv(): *string, *uint64, *string, *uint, *int64
 +CreateDirectory(folder string): error
 +FilenameWithoutExtension(filename string): string
 +ReadFileNamesOfDirectory(folder *string): []string
 +MapUserID(id *string)
 }
 }
-package http-api/otp-identity-responder{
-annotation http-api/otp-identity-responder {
+package http-api/common{
+annotation http-api/common {
+
+
+-extractCredentials(request *Request): *string, *string
+-extractFileName(request *Request): *string
++ChallengeLoginHTTP(request *Request, writer ResponseWriter): *UserOtp, error
++ChallengeReadFileHTTP(request *Request, writer ResponseWriter): *[]byte, error
++ChallengeWriteFileHTTP(request *Request, writer ResponseWriter, maxSize *int64): error
++SanitizeFileName(fileName *string)
++SanitizeUploadFile(request *Request, maxSize *int64): string, string, File, *FileHeader, error
+}
+}
+package http-api/responder/otp-identity-responder{
+annotation http-api/responder/otp-identity-responder {
 -const Url: IdentityResponse
 -const Combination: IdentityResponse
 -const QR: IdentityResponse
@@ -48,10 +62,10 @@ class UrlResponder {
 +Send()
 }
 }
-package http-api/otp-login-responder{
-annotation http-api/otp-login-responder {
--const FileList: LoginResponse
+package http-api/responder/otp-login-responder{
+annotation http-api/responder/otp-login-responder {
 -const AccountInterface: LoginResponse
+-const FileList: LoginResponse
 
 +SelectResponder(mode *LoginResponse, foundID *UserOtp, w *ResponseWriter): LoginResponder
 }
@@ -86,10 +100,10 @@ package http-api{
 annotation http-api {
 
 
-+FileHandler()
++FileHandler(maxSize *int64)
 +MiscHandler()
 +OTPHandler()
-+InitializeHTTPServer(port *string)
++InitializeHTTPServer(port *string, maxSize *int64)
 }
 }
 package permission-controller/id-manager/content-modifier{
@@ -97,8 +111,8 @@ annotation permission-controller/id-manager/content-modifier {
 
 -var PathToIdentities: 
 -var PathToFilesOfIdentities: 
-+WriteFile()
-+ReadFile()
++WriteFile(fileName string, file *File): error
++ReadFile(name string): *[]byte, error
 +DeleteFile()
 +InitializeOTPModifier()
 +ReadAllIdentities(): *map[string]*UserOtp
@@ -135,12 +149,12 @@ annotation permission-controller/id-manager {
 package permission-controller{
 annotation permission-controller {
 -const SAFE_CHARACTERS: STRING
+-var idGenerator: *Shortid
 -var GenerateOtpOpts: GenerateOpts
 -var ValidateOtpOpts: ValidateOpts
--var idGenerator: *Shortid
 +ChallengeLogin(id *string, clientCode *string, time *Time): *UserOtp, error
-+ChallengeReadFile()
-+ChallengeWriteFile()
++ChallengeReadFile(id *string, clientCode *string, time *Time, fileName *string): *[]byte, error
++ChallengeWriteFile(id *string, clientCode *string, time *Time, fileName *string, file *File): error
 +ChallengeDeleteFile()
 +ChallengeDeleteIdentity()
 +InitializeOTPGenerator(seed *uint64, issuer *string, period *uint)
