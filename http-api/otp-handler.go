@@ -4,10 +4,10 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	otpresponder "otp-filemanager/http-api/otp-identity-responder"
-	otp_login_responder "otp-filemanager/http-api/otp-login-responder"
+	"otp-filemanager/http-api/common"
+	otpresponder "otp-filemanager/http-api/responder/otp-identity-responder"
+	otp_login_responder "otp-filemanager/http-api/responder/otp-login-responder"
 	permissioncontroller "otp-filemanager/permission-controller"
-	"time"
 )
 
 // initialize otp related endpoints
@@ -46,25 +46,16 @@ func OTPHandler() {
 		query := r.URL.Query()
 		// see loginresponder for all "resp" possibilities
 		mode := otp_login_responder.LoginResponse(query.Get("resp"))
-		// get username and password
-		r.ParseForm()
-		id := r.FormValue("user")
-		clientOverlappingCode := r.FormValue("password")
-
-		currentTime := time.Now()
 
 		// check if user exists and code is valid
-		foundID, err := permissioncontroller.ChallengeLogin(&id, &clientOverlappingCode, &currentTime)
+		foundID, err := common.ChallengeLoginHTTP(r, w)
 
 		if err != nil {
-			w.WriteHeader(401)
-			w.Write([]byte("Access Denied"))
-			log.Println("Login Failed", id, "at", currentTime)
 			return
 		}
 
 		responder := otp_login_responder.SelectResponder(&mode, foundID, &w)
 		responder.Send()
-		log.Println("Login Successful", id, "at", currentTime)
+		log.Println("Login Successful", foundID.Id)
 	})
 }

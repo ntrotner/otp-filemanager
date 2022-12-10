@@ -7,9 +7,9 @@ import (
 )
 
 func main() {
-	port, idSeed, issuer, period := helper.ReadEnv()
+	port, idSeed, issuer, period, maxSize := helper.ReadEnv()
 
 	// initialize modules
 	permissioncontroller.InitializeOTPGenerator(idSeed, issuer, period)
-	httpapi.InitializeHTTPServer(port)
+	httpapi.InitializeHTTPServer(port, maxSize)
 }
