@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# formatting
+if [[ $(gofmt -l . | wc -l) == 0 ]]; then echo "Format Successful"; else echo "Format Failed" && exit 1; fi
+
+# tests
+# change exit of failed after adding tests
+if [[ $(go test ./... | wc -l) == 0 ]]; then echo "Test Successful"; else echo "Test Failed"; fi
+
+# code quality
+if [[ $(go vet ./... | wc -l) == 0 ]]; then echo "Vet Successful"; else echo "Vet Failed" && exit 1; fi
+
+# code quality
+if [[ $(staticcheck ./... | wc -l) == 0 ]]; then echo "staticcheck Successful"; else echo "staticcheck Failed" && exit 1; fi
+
