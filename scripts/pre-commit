@@ -12,4 +12,6 @@ if [[ $(go vet ./... | wc -l) == 0 ]]; then echo "Vet Successful"; else echo "Ve
 
 # code quality
 if [[ $(staticcheck ./... | wc -l) == 0 ]]; then echo "staticcheck Successful"; else echo "staticcheck Failed" && exit 1; fi
+if [[ $(gocyclo -over 10 . | wc -l) == 0 ]]; then echo "Gocyclo Successful"; else echo "Gocyclo Failed" && exit 1; fi
+if [[ $(ineffassign ./... | wc -l) == 0 ]]; then echo "Gocyclo Successful"; else echo "Gocyclo Failed" && exit 1; fi
 
