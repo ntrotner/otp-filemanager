@@ -58,8 +58,18 @@ func getMaxSize() *int64 {
 	return &maxSize
 }
 
+func getModifier() *int8 {
+	modifier_i64, err := strconv.ParseInt(os.Getenv("MODIFIER"), 10, 8)
+	modifier := int8(modifier_i64)
+
+	if err != nil {
+		modifier = int8(0)
+	}
+	return &modifier
+}
+
 // get required env variables for running the service
-func ReadEnv() (*string, *uint64, *string, *uint, *int64) {
+func ReadEnv() (*string, *uint64, *string, *uint, *int64, *int8) {
 	godotenv.Load(".env")
 
 	port := getPort()
@@ -67,6 +77,7 @@ func ReadEnv() (*string, *uint64, *string, *uint, *int64) {
 	issuer := getIssuer()
 	period := getPeriod()
 	maxSize := getMaxSize()
+	modifier := getModifier()
 
-	return port, idSeed, issuer, period, maxSize
+	return port, idSeed, issuer, period, maxSize, modifier
 }

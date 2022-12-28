@@ -6,7 +6,6 @@ import (
 	"mime/multipart"
 	idmanager "otp-filemanager/permission-controller/id-manager"
 	content_modifier "otp-filemanager/permission-controller/id-manager/content-modifier"
-	"path"
 	"time"
 
 	"github.com/pquerna/otp/totp"
@@ -36,7 +35,7 @@ func ChallengeReadFile(id *string, clientCode *string, time *time.Time, fileName
 		return nil, err
 	}
 
-	file, err := content_modifier.ReadFile(path.Join(content_modifier.PathToFilesOfIdentities, foundID.Id, *fileName))
+	file, err := idmanager.Modifier.FileModifier.ReadFile(&foundID.Id, fileName)
 	if err != nil {
 		log.Println("Error for Read File:", err)
 		return nil, err
@@ -50,7 +49,7 @@ func ChallengeWriteFile(id *string, clientCode *string, time *time.Time, fileNam
 	if err != nil {
 		return err
 	}
-	err = content_modifier.WriteFile(path.Join(content_modifier.PathToFilesOfIdentities, foundID.Id, *fileName), file)
+	err = idmanager.Modifier.FileModifier.WriteFile(&foundID.Id, fileName, file)
 
 	return err
 }

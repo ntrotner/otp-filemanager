@@ -1,14 +1,15 @@
 package content_modifier
 
 import (
-	"path/filepath"
-
 	"github.com/pquerna/otp"
 )
 
-var PathToIdentities = filepath.Join("live-data", "identities")
+const FileSystem int8 = 0
 
-var PathToFilesOfIdentities = filepath.Join("live-data", "files")
+type Modifier struct {
+	FileModifier FileModifier
+	OtpModifier  OtpModifier
+}
 
 type UserOtp struct {
 	Id  string
