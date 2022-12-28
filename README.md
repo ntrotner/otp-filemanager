@@ -6,8 +6,9 @@ the endpoints, as it's stateless and relies on an up-to-date OTP.
 
 ## Run a Build
 1. Check branch `release/x.x`
-2. Set variables in `.env` (see below)
-3. Run `./otp-filemanager-x.x`
+2. Download `otp-filemanager-x.x.tar`
+3. Set variables in `.env` (see below)
+4. Run `./otp-filemanager-x.x`
 
 
 ## Run for Development
@@ -17,6 +18,7 @@ the endpoints, as it's stateless and relies on an up-to-date OTP.
   * Set `ISSUER` to your service name with URL compatible characters 
   * Set `PERIOD` to seconds a OTP is valid
   * Set `MAXFILESIZEMB` to set the max size for an uploaded file
+  * Set `MODIFIER` to set how the files and users are managed
 2. `go run main.go`
 
 
@@ -24,6 +26,7 @@ the endpoints, as it's stateless and relies on an up-to-date OTP.
 
 1. [Create Account](/docs/createAccount.md)
 2. [Authentication](/docs/authentication.md)
+3. [File and User Handler](/docs/fileHandler.md)
 
 
 ## Inner Workings

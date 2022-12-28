@@ -1,34 +1,15 @@
 package content_modifier
 
 import (
-	"io"
 	"mime/multipart"
-	"os"
 )
 
-func WriteFile(fileName string, file *multipart.File) error {
-	fileBytes, err := io.ReadAll(*file)
-	if err != nil {
-		return err
-	}
+type WriteFile func(id *string, fileName *string, file *multipart.File) error
+type ReadFile func(id *string, name *string) (*[]byte, error)
+type DeleteFile func(id *string, name *string) error
 
-	openedFile, err := os.Create(fileName)
-	if err != nil {
-		return err
-	}
-
-	_, err = openedFile.Write(fileBytes)
-
-	return err
-}
-
-func ReadFile(name string) (*[]byte, error) {
-	fo, err := os.ReadFile(name)
-	if err != nil {
-		return nil, err
-	}
-	return &fo, nil
-}
-
-func DeleteFile() {
+type FileModifier struct {
+	WriteFile  WriteFile
+	ReadFile   ReadFile
+	DeleteFile DeleteFile
 }
