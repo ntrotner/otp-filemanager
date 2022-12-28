@@ -2,7 +2,7 @@ package otp_identity_responder
 
 import (
 	"net/http"
-	content_modifier "otp-filemanager/permission-controller/id-manager/content-modifier"
+	content_modifier "otp-filemanager/entity-controller/id-manager/content-modifier"
 )
 
 func SelectResponder(mode *IdentityResponse, newUser *content_modifier.UserOtp, w *http.ResponseWriter) IdentityResponder {

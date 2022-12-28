@@ -4,10 +4,10 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	entity_controller "otp-filemanager/entity-controller"
 	"otp-filemanager/http-api/common"
-	otpresponder "otp-filemanager/http-api/responder/otp-identity-responder"
+	otp_responder "otp-filemanager/http-api/responder/otp-identity-responder"
 	otp_login_responder "otp-filemanager/http-api/responder/otp-login-responder"
-	permissioncontroller "otp-filemanager/permission-controller"
 )
 
 // initialize otp related endpoints
@@ -27,9 +27,9 @@ func OTPHandler() {
 	http.HandleFunc("/createIdentity", func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query()
 		// see otpresponder for all "resp" possibilities
-		mode := otpresponder.IdentityResponse(query.Get("resp"))
+		mode := otp_responder.IdentityResponse(query.Get("resp"))
 		// create new random identity
-		newUser, err := permissioncontroller.CreateIdentity()
+		newUser, err := entity_controller.CreateIdentity()
 
 		if err != nil {
 			w.WriteHeader(500)
@@ -37,7 +37,7 @@ func OTPHandler() {
 			return
 		}
 
-		responder := otpresponder.SelectResponder(&mode, newUser, &w)
+		responder := otp_responder.SelectResponder(&mode, newUser, &w)
 		responder.Send()
 	})
 

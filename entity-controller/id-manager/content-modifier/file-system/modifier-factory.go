@@ -1,6 +1,6 @@
 package file_system
 
-import content_modifier "otp-filemanager/permission-controller/id-manager/content-modifier"
+import content_modifier "otp-filemanager/entity-controller/id-manager/content-modifier"
 
 func CreateFileSystemModifier() content_modifier.Modifier {
 	return content_modifier.Modifier{

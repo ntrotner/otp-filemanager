@@ -1,15 +1,15 @@
 package main
 
 import (
+	entity_controller "otp-filemanager/entity-controller"
 	"otp-filemanager/helper"
-	httpapi "otp-filemanager/http-api"
-	permissioncontroller "otp-filemanager/permission-controller"
+	http_api "otp-filemanager/http-api"
 )
 
 func main() {
 	port, idSeed, issuer, period, maxSize, modifier := helper.ReadEnv()
 
 	// initialize modules
-	permissioncontroller.InitializeOTPGenerator(modifier, idSeed, issuer, period)
-	httpapi.InitializeHTTPServer(port, maxSize)
+	entity_controller.InitializeOTPGenerator(modifier, idSeed, issuer, period)
+	http_api.InitializeHTTPServer(port, maxSize)
 }

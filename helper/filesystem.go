@@ -1,7 +1,6 @@
 package helper
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -24,7 +23,7 @@ func FilenameWithoutExtension(filename string) string {
 func ReadFileNamesOfDirectory(folder *string) []string {
 	fileNames := make([]string, 0)
 
-	files, err := ioutil.ReadDir(*folder)
+	files, err := os.ReadDir(*folder)
 	if err != nil {
 		return fileNames
 	}

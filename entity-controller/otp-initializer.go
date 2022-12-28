@@ -2,9 +2,9 @@ package permission_controller
 
 import (
 	"log"
+	id_manager "otp-filemanager/entity-controller/id-manager"
+	content_modifier "otp-filemanager/entity-controller/id-manager/content-modifier"
 	"otp-filemanager/helper"
-	idmanager "otp-filemanager/permission-controller/id-manager"
-	contentmodifier "otp-filemanager/permission-controller/id-manager/content-modifier"
 
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
@@ -21,7 +21,7 @@ const SAFE_CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRS
 
 // InitializeOTPGenerator create worker for generating identities and default options for otp
 func InitializeOTPGenerator(modifier *int8, seed *uint64, issuer *string, period *uint) {
-	idmanager.InitializeIDManager(modifier)
+	id_manager.InitializeIDManager(modifier)
 	idGenerator, _ = shortid.New(1, SAFE_CHARACTERS, *seed)
 
 	GenerateOtpOpts = totp.GenerateOpts{
@@ -43,7 +43,7 @@ func InitializeOTPGenerator(modifier *int8, seed *uint64, issuer *string, period
 }
 
 // create new random identity
-func CreateIdentity() (*contentmodifier.UserOtp, error) {
+func CreateIdentity() (*content_modifier.UserOtp, error) {
 	// create new identity
 	newId, err := idGenerator.Generate()
 	if err != nil {
@@ -54,7 +54,7 @@ func CreateIdentity() (*contentmodifier.UserOtp, error) {
 	helper.MapUserID(&newId)
 
 	// check if identity exist and fail if it does
-	userOtp, err := idmanager.ExistsIdentity(&newId)
+	userOtp, err := id_manager.ExistsIdentity(&newId)
 	if err == nil {
 		return userOtp, err
 	}
@@ -66,13 +66,13 @@ func CreateIdentity() (*contentmodifier.UserOtp, error) {
 	// generate otp key
 	key, _ := totp.Generate(otpUserOpts)
 
-	newUser := contentmodifier.UserOtp{
+	newUser := content_modifier.UserOtp{
 		Id:  newId,
 		Key: *key,
 	}
 
 	// save new identity
-	err = idmanager.CreateIdentity(&newId, &newUser)
+	err = id_manager.CreateIdentity(&newId, &newUser)
 
 	if err != nil {
 		log.Println(err)
