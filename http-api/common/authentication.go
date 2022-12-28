@@ -3,8 +3,8 @@ package common
 import (
 	"log"
 	"net/http"
-	permissioncontroller "otp-filemanager/permission-controller"
-	content_modifier "otp-filemanager/permission-controller/id-manager/content-modifier"
+	entity_controller "otp-filemanager/entity-controller"
+	content_modifier "otp-filemanager/entity-controller/id-manager/content-modifier"
 	"time"
 )
 
@@ -31,7 +31,7 @@ func ChallengeLoginHTTP(request *http.Request, writer http.ResponseWriter) (*con
 	currentTime := time.Now()
 
 	// check if user exists and code is valid
-	foundID, err := permissioncontroller.ChallengeLogin(id, clientOverlappingCode, &currentTime)
+	foundID, err := entity_controller.ChallengeLogin(id, clientOverlappingCode, &currentTime)
 	if err != nil {
 		writer.WriteHeader(401)
 		writer.Write([]byte("Access Denied"))
@@ -50,7 +50,7 @@ func ChallengeReadFileHTTP(request *http.Request, writer http.ResponseWriter) (*
 	currentTime := time.Now()
 
 	// check if user exists and code is valid
-	foundFile, err := permissioncontroller.ChallengeReadFile(id, clientOverlappingCode, &currentTime, fileName)
+	foundFile, err := entity_controller.ChallengeReadFile(id, clientOverlappingCode, &currentTime, fileName)
 	if err != nil {
 		writer.WriteHeader(401)
 		writer.Write([]byte("Access Denied"))
@@ -74,7 +74,7 @@ func ChallengeWriteFileHTTP(request *http.Request, writer http.ResponseWriter, m
 	currentTime := time.Now()
 
 	// check if user exists and code is valid
-	err = permissioncontroller.ChallengeWriteFile(&id, &clientOverlappingCode, &currentTime, &handler.Filename, &file)
+	err = entity_controller.ChallengeWriteFile(&id, &clientOverlappingCode, &currentTime, &handler.Filename, &file)
 	if err != nil {
 		writer.WriteHeader(401)
 		writer.Write([]byte("Access Denied"))

@@ -2,8 +2,8 @@ package id_manager
 
 import (
 	"errors"
-	content_modifier "otp-filemanager/permission-controller/id-manager/content-modifier"
-	file_system "otp-filemanager/permission-controller/id-manager/content-modifier/file-system"
+	content_modifier "otp-filemanager/entity-controller/id-manager/content-modifier"
+	file_system "otp-filemanager/entity-controller/id-manager/content-modifier/file-system"
 )
 
 var (
@@ -32,7 +32,7 @@ func ExistsIdentity(id *string) (*content_modifier.UserOtp, error) {
 		return user, nil
 	}
 
-	return user, errors.New("User couldn't be found")
+	return user, errors.New("user couldn't be found")
 }
 
 // CreateIdentity creates new identity in memory and filesystem
@@ -40,7 +40,7 @@ func CreateIdentity(id *string, user_otp *content_modifier.UserOtp) error {
 	err := Modifier.OtpModifier.WriteIdentity(id, user_otp)
 
 	if err != nil {
-		return errors.New("Couldn't write user to database")
+		return errors.New("couldn't write user to database")
 	}
 
 	existingIDs[*id] = user_otp

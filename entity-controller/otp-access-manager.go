@@ -4,8 +4,8 @@ import (
 	"errors"
 	"log"
 	"mime/multipart"
-	idmanager "otp-filemanager/permission-controller/id-manager"
-	content_modifier "otp-filemanager/permission-controller/id-manager/content-modifier"
+	id_manager "otp-filemanager/entity-controller/id-manager"
+	content_modifier "otp-filemanager/entity-controller/id-manager/content-modifier"
 	"time"
 
 	"github.com/pquerna/otp/totp"
@@ -13,7 +13,7 @@ import (
 
 // ChallengeLogin finds user and checks if code is valid
 func ChallengeLogin(id *string, clientCode *string, time *time.Time) (*content_modifier.UserOtp, error) {
-	foundID, err := idmanager.ExistsIdentity(id)
+	foundID, err := id_manager.ExistsIdentity(id)
 
 	if err != nil {
 		return foundID, err
@@ -35,7 +35,7 @@ func ChallengeReadFile(id *string, clientCode *string, time *time.Time, fileName
 		return nil, err
 	}
 
-	file, err := idmanager.Modifier.FileModifier.ReadFile(&foundID.Id, fileName)
+	file, err := id_manager.Modifier.FileModifier.ReadFile(&foundID.Id, fileName)
 	if err != nil {
 		log.Println("Error for Read File:", err)
 		return nil, err
@@ -49,7 +49,7 @@ func ChallengeWriteFile(id *string, clientCode *string, time *time.Time, fileNam
 	if err != nil {
 		return err
 	}
-	err = idmanager.Modifier.FileModifier.WriteFile(&foundID.Id, fileName, file)
+	err = id_manager.Modifier.FileModifier.WriteFile(&foundID.Id, fileName, file)
 
 	return err
 }

@@ -2,11 +2,10 @@ package file_system
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"os"
+	content_modifier "otp-filemanager/entity-controller/id-manager/content-modifier"
 	"otp-filemanager/helper"
-	content_modifier "otp-filemanager/permission-controller/id-manager/content-modifier"
 	"path"
 	"path/filepath"
 	"time"
@@ -35,7 +34,7 @@ func InitializeOTPModifier() {
 // ReadAllIdentities parses all identities in the directory
 func ReadAllIdentities() *map[string]*content_modifier.UserOtp {
 	var otpIdentities = make(map[string]*content_modifier.UserOtp)
-	fileInfos, err := ioutil.ReadDir(PathToIdentities)
+	fileInfos, err := os.ReadDir(PathToIdentities)
 	if err != nil {
 		log.Println(err)
 		os.Exit(1)
@@ -59,7 +58,7 @@ func ReadAllIdentities() *map[string]*content_modifier.UserOtp {
 func ReadIdentity(id *string) (*content_modifier.UserOtp, error) {
 	readUser := content_modifier.FilesystemUserOtp{}
 	parsedUser := content_modifier.UserOtp{}
-	byteFile, err := ioutil.ReadFile(filepath.Join(PathToIdentities, *id+".json"))
+	byteFile, err := os.ReadFile(filepath.Join(PathToIdentities, *id+".json"))
 
 	if err != nil {
 		log.Println(err)
