@@ -4,6 +4,7 @@ import (
 	"log"
 	id_manager "otp-filemanager/entity-controller/id-manager"
 	content_modifier "otp-filemanager/entity-controller/id-manager/content-modifier"
+	"otp-filemanager/entity-controller/security"
 	"otp-filemanager/helper"
 
 	"github.com/pquerna/otp"
@@ -20,7 +21,8 @@ var (
 const SAFE_CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-"
 
 // InitializeOTPGenerator create worker for generating identities and default options for otp
-func InitializeOTPGenerator(modifier *int8, seed *uint64, issuer *string, period *uint) {
+func InitializeOTPGenerator(key *string, modifier *int8, seed *uint64, issuer *string, period *uint) {
+	security.InitializeSecurity(key)
 	id_manager.InitializeIDManager(modifier)
 	idGenerator, _ = shortid.New(1, SAFE_CHARACTERS, *seed)
 

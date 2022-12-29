@@ -1,4 +1,97 @@
 @startuml
+package entity-controller/id-manager/content-modifier/file-system{
+annotation entity-controller/id-manager/content-modifier/file-system {
+
+-var PathToIdentities: 
+-var PathToFilesOfIdentities: 
++WriteFile(id *string, fileName *string, file *File): error
++ReadFile(id *string, name *string): *[]byte, error
++DeleteFile(id *string, name *string): error
++CreateFileSystemModifier(): Modifier
++InitializeOTPModifier()
++ReadAllIdentities(): *map[string]*UserOtp
++ReadIdentity(id *string): *UserOtp, error
++WriteIdentity(id *string, identity *UserOtp): error
++DeleteIdentity(id *string): error
++ReadFilesOfIdentity(id *string): []string
+}
+}
+package entity-controller/id-manager/content-modifier{
+annotation entity-controller/id-manager/content-modifier {
+-const FileSystem: int8
+
+
+}
+class FileModifier {
++WriteFile: WriteFile
++ReadFile: ReadFile
++DeleteFile: DeleteFile
+
+}
+class OtpModifier {
++InitializeOTPModifier: InitializeOTPModifier
++ReadAllIdentities: ReadAllIdentities
++ReadIdentity: ReadIdentity
++WriteIdentity: WriteIdentity
++DeleteIdentity: DeleteIdentity
++ReadFilesOfIdentity: ReadFilesOfIdentity
+
+}
+class Modifier {
++FileModifier: FileModifier
++OtpModifier: OtpModifier
+
+}
+class UserOtp {
++Id: string
++Key: Key
+
+}
+class FilesystemUserOtp {
++URL_Key: string
++Issued_Date: string
+
+}
+class LoginChallenge {
++Files: []string
+
+}
+}
+package entity-controller/id-manager{
+annotation entity-controller/id-manager {
+
+-var existingIDs: map[string]*UserOtp
+-var Modifier: Modifier
++InitializeIDManager(modifierType *int8)
++ExistsIdentity(id *string): *UserOtp, error
++CreateIdentity(id *string, user_otp *UserOtp): error
++ReadFilesOfIdentity(id *string): []string
+}
+}
+package entity-controller/security{
+annotation entity-controller/security {
+
+-var Block: Block
++InitializeSecurity(input_key *string)
++Encrypt(toEncrypt *[]byte): *[]byte, error
++Decrypt(toDecrypt *[]byte): *[]byte, error
+}
+}
+package entity-controller{
+annotation entity-controller {
+-const SAFE_CHARACTERS: STRING
+-var ValidateOtpOpts: ValidateOpts
+-var idGenerator: *Shortid
+-var GenerateOtpOpts: GenerateOpts
++ChallengeLogin(id *string, clientCode *string, time *Time): *UserOtp, error
++ChallengeReadFile(id *string, clientCode *string, time *Time, fileName *string): *[]byte, error
++ChallengeWriteFile(id *string, clientCode *string, time *Time, fileName *string, file *File): error
++ChallengeDeleteFile()
++ChallengeDeleteIdentity()
++InitializeOTPGenerator(key *string, modifier *int8, seed *uint64, issuer *string, period *uint)
++CreateIdentity(): *UserOtp, error
+}
+}
 package helper{
 annotation helper {
 
@@ -8,7 +101,9 @@ annotation helper {
 -getPeriod(): *uint
 -getIDSeed(): *uint64
 -getMaxSize(): *int64
-+ReadEnv(): *string, *uint64, *string, *uint, *int64
+-getModifier(): *int8
+-getKey(): *string
++ReadEnv(): *string, *uint64, *string, *uint, *int64, *int8, *string
 +CreateDirectory(folder string): error
 +FilenameWithoutExtension(filename string): string
 +ReadFileNamesOfDirectory(folder *string): []string
@@ -30,9 +125,9 @@ annotation http-api/common {
 }
 package http-api/responder/otp-identity-responder{
 annotation http-api/responder/otp-identity-responder {
--const Url: IdentityResponse
 -const Combination: IdentityResponse
 -const QR: IdentityResponse
+-const Url: IdentityResponse
 
 +SelectResponder(mode *IdentityResponse, newUser *UserOtp, w *ResponseWriter): IdentityResponder
 }
@@ -64,8 +159,8 @@ class UrlResponder {
 }
 package http-api/responder/otp-login-responder{
 annotation http-api/responder/otp-login-responder {
--const AccountInterface: LoginResponse
 -const FileList: LoginResponse
+-const AccountInterface: LoginResponse
 
 +SelectResponder(mode *LoginResponse, foundID *UserOtp, w *ResponseWriter): LoginResponder
 }
@@ -106,61 +201,6 @@ annotation http-api {
 +InitializeHTTPServer(port *string, maxSize *int64)
 }
 }
-package permission-controller/id-manager/content-modifier{
-annotation permission-controller/id-manager/content-modifier {
-
--var PathToIdentities: 
--var PathToFilesOfIdentities: 
-+WriteFile(fileName string, file *File): error
-+ReadFile(name string): *[]byte, error
-+DeleteFile()
-+InitializeOTPModifier()
-+ReadAllIdentities(): *map[string]*UserOtp
-+ReadIdentity(id *string): *UserOtp, error
-+WriteIdentity(id *string, identity *UserOtp): error
-+DeleteIdentity(id *string): error
-+ReadFilesOfIdentity(id *string): []string
-}
-class UserOtp {
-+Id: string
-+Key: Key
-
-}
-class FilesystemUserOtp {
-+URL_Key: string
-+Issued_Date: string
-
-}
-class LoginChallenge {
-+Files: []string
-
-}
-}
-package permission-controller/id-manager{
-annotation permission-controller/id-manager {
-
--var existingIDs: map[string]*UserOtp
-+InitializeIDManager()
-+ExistsIdentity(id *string): *UserOtp, error
-+CreateIdentity(id *string, user_otp *UserOtp): error
-+ReadFilesOfIdentity(id *string): []string
-}
-}
-package permission-controller{
-annotation permission-controller {
--const SAFE_CHARACTERS: STRING
--var idGenerator: *Shortid
--var GenerateOtpOpts: GenerateOpts
--var ValidateOtpOpts: ValidateOpts
-+ChallengeLogin(id *string, clientCode *string, time *Time): *UserOtp, error
-+ChallengeReadFile(id *string, clientCode *string, time *Time, fileName *string): *[]byte, error
-+ChallengeWriteFile(id *string, clientCode *string, time *Time, fileName *string, file *File): error
-+ChallengeDeleteFile()
-+ChallengeDeleteIdentity()
-+InitializeOTPGenerator(seed *uint64, issuer *string, period *uint)
-+CreateIdentity(): *UserOtp, error
-}
-}
 package .{
 annotation . {
 
@@ -168,13 +208,15 @@ annotation . {
 -main()
 }
 }
+"Modifier" --> "FileModifier"
+"Modifier" --> "OtpModifier"
+"IdentityResponderTool" --> "UserOtp"
+"LoginResponderTool" --> "UserOtp"
 "CombinedResponder" --> "IdentityResponderTool"
 "QRCodeResponder" --> "IdentityResponderTool"
 "UrlResponder" --> "IdentityResponderTool"
-"IdentityResponderTool" --> "UserOtp"
 "AccountInterfaceResponder" --> "LoginResponderTool"
 "FileListResponder" --> "LoginResponderTool"
-"LoginResponderTool" --> "UserOtp"
 "CombinedResponder" --|> "IdentityResponder"
 "CombinedResponder" --|> "LoginResponder"
 "QRCodeResponder" --|> "IdentityResponder"

@@ -5,6 +5,7 @@ import (
 	"io"
 	"mime/multipart"
 	"os"
+	"otp-filemanager/entity-controller/security"
 	"path"
 )
 
@@ -19,7 +20,12 @@ func WriteFile(id *string, fileName *string, file *multipart.File) error {
 		return err
 	}
 
-	_, err = openedFile.Write(fileBytes)
+	fileBytes_ptr, err := security.Encrypt(&fileBytes)
+	if err != nil {
+		return err
+	}
+
+	_, err = openedFile.Write(*fileBytes_ptr)
 
 	return err
 }
@@ -29,7 +35,7 @@ func ReadFile(id *string, name *string) (*[]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &fo, nil
+	return security.Decrypt(&fo)
 }
 
 func DeleteFile(id *string, name *string) error {

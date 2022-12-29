@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	content_modifier "otp-filemanager/entity-controller/id-manager/content-modifier"
+	"otp-filemanager/entity-controller/security"
 	"otp-filemanager/helper"
 	"path"
 	"path/filepath"
@@ -65,10 +66,16 @@ func ReadIdentity(id *string) (*content_modifier.UserOtp, error) {
 		return &parsedUser, err
 	}
 
-	err = json.Unmarshal(byteFile, &readUser)
-
+	decryptedIdentity, err := security.Decrypt(&byteFile)
 	if err != nil {
 		log.Println(err)
+		return &parsedUser, err
+	}
+
+	err = json.Unmarshal(*decryptedIdentity, &readUser)
+
+	if err != nil {
+		log.Println("Couldn't parse JSON for Identity")
 		return &parsedUser, err
 	}
 
@@ -99,7 +106,13 @@ func WriteIdentity(id *string, identity *content_modifier.UserOtp) error {
 		return err
 	}
 
-	err = os.WriteFile(filepath.Join(PathToIdentities, *id+".json"), file, 0644)
+	encryptedIdentity, err := security.Encrypt(&file)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	err = os.WriteFile(filepath.Join(PathToIdentities, *id+".json"), *encryptedIdentity, 0644)
 
 	if err != nil {
 		log.Println(err)

@@ -68,16 +68,26 @@ func getModifier() *int8 {
 	return &modifier
 }
 
+func getKey() *string {
+	key := os.Getenv("KEY")
+	if key == "" {
+		// set unsecure key
+		key = ""
+	}
+	return &key
+}
+
 // get required env variables for running the service
-func ReadEnv() (*string, *uint64, *string, *uint, *int64, *int8) {
+func ReadEnv() (*string, *uint64, *string, *uint, *int64, *int8, *string) {
 	godotenv.Load(".env")
 
-	port := getPort()
 	idSeed := getIDSeed()
 	issuer := getIssuer()
-	period := getPeriod()
+	key := getKey()
 	maxSize := getMaxSize()
 	modifier := getModifier()
+	period := getPeriod()
+	port := getPort()
 
-	return port, idSeed, issuer, period, maxSize, modifier
+	return port, idSeed, issuer, period, maxSize, modifier, key
 }
