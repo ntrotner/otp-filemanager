@@ -19,6 +19,7 @@ the endpoints, as it's stateless and relies on an up-to-date OTP.
   * Set `PERIOD` to seconds a OTP is valid
   * Set `MAXFILESIZEMB` to set the max size for an uploaded file
   * Set `MODIFIER` to set how the files and users are managed
+  * Set `KEY` to a random 32 long string for encryption. Leave empty to disable it.
 2. `go run main.go`
 
 
@@ -34,6 +35,8 @@ The authentication relies on a randomly generated username and OTP (currently on
 The password has to be up-to-date, as no other authentication method is used for the user actions.
 
 Files and user related information are saved directly to the file system.
+When using `release/1.2` and above, there is the possibility to enable encryption. 
+
 ### Architecture
 
 ![Overview](./docs/architecture/actual.png)
@@ -44,4 +47,3 @@ Files and user related information are saved directly to the file system.
 - Separate (better) UI
 - Extend to other OTP methods other than TOTP
 - Implement alternative methods of saving users and files
-- Encrypt users and files
