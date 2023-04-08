@@ -21,9 +21,9 @@ var (
 const SAFE_CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-"
 
 // InitializeOTPGenerator create worker for generating identities and default options for otp
-func InitializeOTPGenerator(key *string, modifier *int8, seed *uint64, issuer *string, period *uint) {
+func InitializeOTPGenerator(key *string, modifier *int8, seed *uint64, issuer *string, period *uint, expirationTime *int64) {
 	security.InitializeSecurity(key)
-	id_manager.InitializeIDManager(modifier)
+	id_manager.InitializeIDManager(modifier, expirationTime)
 	idGenerator, _ = shortid.New(1, SAFE_CHARACTERS, *seed)
 
 	GenerateOtpOpts = totp.GenerateOpts{

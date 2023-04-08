@@ -77,8 +77,18 @@ func getKey() *string {
 	return &key
 }
 
+func getExpirationTime() *int64 {
+	// parse minutes to int64
+	expirationTime, err := strconv.ParseInt(os.Getenv("EXPIRATIONTIME"), 10, 64)
+
+	if err != nil {
+		expirationTime = int64(0)
+	}
+	return &expirationTime
+}
+
 // get required env variables for running the service
-func ReadEnv() (*string, *uint64, *string, *uint, *int64, *int8, *string) {
+func ReadEnv() (*string, *uint64, *string, *uint, *int64, *int8, *string, *int64) {
 	godotenv.Load(".env")
 
 	idSeed := getIDSeed()
@@ -88,6 +98,7 @@ func ReadEnv() (*string, *uint64, *string, *uint, *int64, *int8, *string) {
 	modifier := getModifier()
 	period := getPeriod()
 	port := getPort()
+	expirationTime := getExpirationTime()
 
-	return port, idSeed, issuer, period, maxSize, modifier, key
+	return port, idSeed, issuer, period, maxSize, modifier, key, expirationTime
 }
