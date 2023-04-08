@@ -7,12 +7,12 @@ import (
 )
 
 var (
-	existingIDs map[string]*content_modifier.UserOtp
+	ExistingIDs map[string]*content_modifier.UserOtp
 	Modifier    content_modifier.Modifier
 )
 
 // InitializeIDManager prepares the data structures
-func InitializeIDManager(modifierType *int8) {
+func InitializeIDManager(modifierType *int8, expirationTime *int64) {
 	switch *modifierType {
 	case content_modifier.FileSystem:
 		Modifier = file_system.CreateFileSystemModifier()
@@ -21,12 +21,13 @@ func InitializeIDManager(modifierType *int8) {
 	}
 
 	Modifier.OtpModifier.InitializeOTPModifier()
-	existingIDs = *Modifier.OtpModifier.ReadAllIdentities()
+	ExistingIDs = *Modifier.OtpModifier.ReadAllIdentities()
+	OrchestrateExpirationCheck(expirationTime)
 }
 
 // ExistsIdentity check if identity exists
 func ExistsIdentity(id *string) (*content_modifier.UserOtp, error) {
-	user, existsUser := existingIDs[*id]
+	user, existsUser := ExistingIDs[*id]
 
 	if existsUser {
 		return user, nil
@@ -43,7 +44,19 @@ func CreateIdentity(id *string, user_otp *content_modifier.UserOtp) error {
 		return errors.New("couldn't write user to database")
 	}
 
-	existingIDs[*id] = user_otp
+	ExistingIDs[*id] = user_otp
+
+	return nil
+}
+
+// DeleteIdentity deletes an identity in memory and filesystem
+func DeleteIdentity(id *string) error {
+	err := Modifier.OtpModifier.DeleteIdentity(id)
+	delete(ExistingIDs, *id)
+
+	if err != nil {
+		return errors.New("couldn't delete user from database")
+	}
 
 	return nil
 }

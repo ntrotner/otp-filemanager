@@ -14,6 +14,8 @@ import (
 	"github.com/pquerna/otp"
 )
 
+const DateFormat = time.UnixDate
+
 var PathToIdentities = filepath.Join("live-data", "identities")
 
 var PathToFilesOfIdentities = filepath.Join("live-data", "files")
@@ -86,6 +88,14 @@ func ReadIdentity(id *string) (*content_modifier.UserOtp, error) {
 		return &parsedUser, err
 	}
 
+	parsedDate, err := time.Parse(DateFormat, readUser.Issued_Date)
+
+	if err != nil {
+		log.Println(err)
+		return &parsedUser, err
+	}
+
+	parsedUser.IssuedDate = &parsedDate
 	parsedUser.Key = *otpKey
 	parsedUser.Id = *id
 
@@ -96,7 +106,7 @@ func ReadIdentity(id *string) (*content_modifier.UserOtp, error) {
 func WriteIdentity(id *string, identity *content_modifier.UserOtp) error {
 	fsUser := content_modifier.FilesystemUserOtp{
 		URL_Key:     identity.Key.URL(),
-		Issued_Date: time.Now().String(),
+		Issued_Date: time.Now().Format(DateFormat),
 	}
 
 	file, err := json.MarshalIndent(fsUser, "", " ")
@@ -127,18 +137,20 @@ func WriteIdentity(id *string, identity *content_modifier.UserOtp) error {
 		return err
 	}
 
-	_, err = ReadIdentity(id)
+	readIdentity, err := ReadIdentity(id)
+	*identity = *readIdentity
+
 	return err
 }
 
 // DeleteIdentity deletes the file for the identity
 func DeleteIdentity(id *string) error {
-	err := os.Remove(filepath.Join(PathToIdentities, *id+".json"))
+	err := os.RemoveAll(filepath.Join(PathToIdentities, *id+".json"))
 	if err != nil {
 		log.Println(err)
 	}
 
-	err = os.Remove(filepath.Join(PathToFilesOfIdentities, *id))
+	err = os.RemoveAll(filepath.Join(PathToFilesOfIdentities, *id))
 	if err != nil {
 		log.Println(err)
 	}

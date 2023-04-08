@@ -19,7 +19,8 @@ the endpoints, as it's stateless and relies on an up-to-date OTP.
   * Set `PERIOD` to seconds a OTP is valid
   * Set `MAXFILESIZEMB` to set the max size for an uploaded file
   * Set `MODIFIER` to set how the files and users are managed
-  * Set `KEY` to a random 32 long string for encryption. Leave empty to disable it.
+  * Set `KEY` to a random 32 long string for encryption. Leave empty to disable it
+  * Set `EXPIRATIONTIME` to set how long a user should exist until deleted in minutes. Set 0 for infinity
 2. `go run main.go`
 
 

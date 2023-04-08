@@ -1,6 +1,8 @@
 package content_modifier
 
 import (
+	"time"
+
 	"github.com/pquerna/otp"
 )
 
@@ -12,8 +14,9 @@ type Modifier struct {
 }
 
 type UserOtp struct {
-	Id  string
-	Key otp.Key
+	Id         string
+	Key        otp.Key
+	IssuedDate *time.Time
 }
 
 type FilesystemUserOtp struct {
