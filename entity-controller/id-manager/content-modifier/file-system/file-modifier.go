@@ -1,12 +1,13 @@
 package file_system
 
 import (
-	"errors"
 	"io"
+	"log"
 	"mime/multipart"
 	"os"
 	"otp-filemanager/entity-controller/security"
 	"path"
+	"path/filepath"
 )
 
 func WriteFile(id *string, fileName *string, file *multipart.File) error {
@@ -38,6 +39,11 @@ func ReadFile(id *string, name *string) (*[]byte, error) {
 	return security.Decrypt(&fo)
 }
 
-func DeleteFile(id *string, name *string) error {
-	return errors.New("not implemented")
+func DeleteFile(id *string, fileName *string) error {
+	err := os.Remove(filepath.Join(PathToFilesOfIdentities, *id, filepath.Clean(*fileName)))
+	if err != nil {
+		log.Println(err)
+	}
+
+	return err
 }

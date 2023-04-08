@@ -54,8 +54,34 @@ func ChallengeWriteFile(id *string, clientCode *string, time *time.Time, fileNam
 	return err
 }
 
-func ChallengeDeleteFile() {
+func ChallengeDeleteFile(id *string, clientCode *string, time *time.Time, fileName *string) error {
+	foundID, err := ChallengeLogin(id, clientCode, time)
+	if err != nil {
+		log.Println("Error for Delete File:", err)
+		return err
+	}
+
+	err = id_manager.Modifier.FileModifier.DeleteFile(&foundID.Id, fileName)
+	if err != nil {
+		log.Println("Error for Delete Identity:", err)
+		return err
+	}
+
+	return nil
 }
 
-func ChallengeDeleteIdentity() {
+func ChallengeDeleteIdentity(id *string, clientCode *string, time *time.Time) error {
+	foundID, err := ChallengeLogin(id, clientCode, time)
+	if err != nil {
+		log.Println("Error for Delete Identity:", err)
+		return err
+	}
+
+	err = id_manager.Modifier.OtpModifier.DeleteIdentity(&foundID.Id)
+	if err != nil {
+		log.Println("Error for Delete Identity:", err)
+		return err
+	}
+
+	return nil
 }

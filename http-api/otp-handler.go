@@ -58,4 +58,18 @@ func OTPHandler() {
 		responder.Send()
 		log.Println("Login Successful", foundID.Id)
 	})
+
+	// handle deletion of an identity
+	http.HandleFunc("/deleteIdentity", func(w http.ResponseWriter, r *http.Request) {
+		// check if user exists and code is valid
+		id, err := common.ChallengeDeleteIdentity(r, w)
+
+		if err != nil {
+			return
+		}
+
+		w.WriteHeader(200)
+		log.Println("Deleted Identity", *id)
+	})
+
 }

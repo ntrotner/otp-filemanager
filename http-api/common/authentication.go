@@ -84,3 +84,40 @@ func ChallengeWriteFileHTTP(request *http.Request, writer http.ResponseWriter, m
 
 	return nil
 }
+
+func ChallengeDeleteIdentity(request *http.Request, writer http.ResponseWriter) (*string, error) {
+	// get username and password
+	id, clientOverlappingCode := extractCredentials(request)
+
+	currentTime := time.Now()
+
+	// check if user exists and code is valid, then delete all related files and user
+	err := entity_controller.ChallengeDeleteIdentity(id, clientOverlappingCode, &currentTime)
+	if err != nil {
+		writer.WriteHeader(401)
+		writer.Write([]byte("Access Denied"))
+		log.Println("Identity Deletion Failed", *id)
+		return id, err
+	}
+
+	return id, nil
+}
+
+func ChallengeDeleteFile(request *http.Request, writer http.ResponseWriter) error {
+	// get username and password
+	id, clientOverlappingCode := extractCredentials(request)
+	fileName := extractFileName(request)
+
+	currentTime := time.Now()
+
+	// check if user exists and code is valid, then delete selected file
+	err := entity_controller.ChallengeDeleteFile(id, clientOverlappingCode, &currentTime, fileName)
+	if err != nil {
+		writer.WriteHeader(401)
+		writer.Write([]byte("Access Denied"))
+		log.Println("File Deletion Failed", *id)
+		return err
+	}
+
+	return nil
+}
