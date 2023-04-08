@@ -16,7 +16,7 @@ func CheckAndDeleteExpiredIdentities(expirationTime *int64) error {
 	var hasError error = nil
 
 	for id, user := range ExistingIDs {
-		if (*expirationTime != 0) && (*user.IssuedDate).Before(timeThreshhold) {
+		if (*expirationTime != 0) && user.IssuedDate.Before(timeThreshhold) {
 			err := DeleteIdentity(&id)
 			log.Println("Delete Identity:", id)
 
@@ -34,7 +34,7 @@ func OrchestrateExpirationCheck(expirationTime *int64) {
 	scheduler := tasks.New()
 
 	scheduler.Add(&tasks.Task{
-		Interval: time.Duration(10 * time.Second),
+		Interval: time.Duration(60 * time.Second),
 		TaskFunc: func() error {
 			return CheckAndDeleteExpiredIdentities(expirationTime)
 		},

@@ -16,7 +16,7 @@ type Modifier struct {
 type UserOtp struct {
 	Id         string
 	Key        otp.Key
-	IssuedDate *time.Time
+	IssuedDate time.Time
 }
 
 type FilesystemUserOtp struct {

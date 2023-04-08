@@ -95,7 +95,7 @@ func ReadIdentity(id *string) (*content_modifier.UserOtp, error) {
 		return &parsedUser, err
 	}
 
-	parsedUser.IssuedDate = &parsedDate
+	parsedUser.IssuedDate = parsedDate
 	parsedUser.Key = *otpKey
 	parsedUser.Id = *id
 
