@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # formatting
 if [[ $(gofmt -l . | wc -l) == 0 ]]; then echo "Format Successful"; else echo "Format Failed" && exit 1; fi
