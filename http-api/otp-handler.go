@@ -68,7 +68,7 @@ func OTPHandler() {
 			return
 		}
 
-		w.WriteHeader(200)
+		http.Redirect(w, r, "/", 301)
 		log.Println("Deleted Identity", *id)
 	})
 

@@ -39,6 +39,8 @@ func ChallengeLoginHTTP(request *http.Request, writer http.ResponseWriter) (*con
 		return nil, err
 	}
 
+	writer.Header().Add("Authorization", *clientOverlappingCode)
+
 	return foundID, nil
 }
 
