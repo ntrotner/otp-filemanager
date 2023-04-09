@@ -1,12 +1,12 @@
 @startuml
 package entity-controller/id-manager/content-modifier/file-system{
 annotation entity-controller/id-manager/content-modifier/file-system {
-
+-const DateFormat: 
 -var PathToIdentities: 
 -var PathToFilesOfIdentities: 
 +WriteFile(id *string, fileName *string, file *File): error
 +ReadFile(id *string, name *string): *[]byte, error
-+DeleteFile(id *string, name *string): error
++DeleteFile(id *string, fileName *string): error
 +CreateFileSystemModifier(): Modifier
 +InitializeOTPModifier()
 +ReadAllIdentities(): *map[string]*UserOtp
@@ -28,6 +28,38 @@ class FileModifier {
 +DeleteFile: DeleteFile
 
 }
+class WriteFile {
+
+
+}
+class ReadFile {
+
+
+}
+class DeleteFile {
+
+
+}
+class ReadAllIdentities {
+
+
+}
+class ReadIdentity {
+
+
+}
+class WriteIdentity {
+
+
+}
+class DeleteIdentity {
+
+
+}
+class ReadFilesOfIdentity {
+
+
+}
 class OtpModifier {
 +InitializeOTPModifier: InitializeOTPModifier
 +ReadAllIdentities: ReadAllIdentities
@@ -37,14 +69,8 @@ class OtpModifier {
 +ReadFilesOfIdentity: ReadFilesOfIdentity
 
 }
-class Modifier {
-+FileModifier: FileModifier
-+OtpModifier: OtpModifier
+class InitializeOTPModifier {
 
-}
-class UserOtp {
-+Id: string
-+Key: Key
 
 }
 class FilesystemUserOtp {
@@ -56,15 +82,29 @@ class LoginChallenge {
 +Files: []string
 
 }
+class Modifier {
++FileModifier: FileModifier
++OtpModifier: OtpModifier
+
+}
+class UserOtp {
++Id: string
++Key: Key
++IssuedDate: Time
+
+}
 }
 package entity-controller/id-manager{
 annotation entity-controller/id-manager {
 
--var existingIDs: map[string]*UserOtp
+-var ExistingIDs: map[string]*UserOtp
 -var Modifier: Modifier
-+InitializeIDManager(modifierType *int8)
++CheckAndDeleteExpiredIdentities(expirationTime *int64): error
++OrchestrateExpirationCheck(expirationTime *int64)
++InitializeIDManager(modifierType *int8, expirationTime *int64)
 +ExistsIdentity(id *string): *UserOtp, error
 +CreateIdentity(id *string, user_otp *UserOtp): error
++DeleteIdentity(id *string): error
 +ReadFilesOfIdentity(id *string): []string
 }
 }
@@ -80,15 +120,15 @@ annotation entity-controller/security {
 package entity-controller{
 annotation entity-controller {
 -const SAFE_CHARACTERS: STRING
--var ValidateOtpOpts: ValidateOpts
 -var idGenerator: *Shortid
 -var GenerateOtpOpts: GenerateOpts
+-var ValidateOtpOpts: ValidateOpts
 +ChallengeLogin(id *string, clientCode *string, time *Time): *UserOtp, error
 +ChallengeReadFile(id *string, clientCode *string, time *Time, fileName *string): *[]byte, error
 +ChallengeWriteFile(id *string, clientCode *string, time *Time, fileName *string, file *File): error
-+ChallengeDeleteFile()
-+ChallengeDeleteIdentity()
-+InitializeOTPGenerator(key *string, modifier *int8, seed *uint64, issuer *string, period *uint)
++ChallengeDeleteFile(id *string, clientCode *string, time *Time, fileName *string): error
++ChallengeDeleteIdentity(id *string, clientCode *string, time *Time): error
++InitializeOTPGenerator(key *string, modifier *int8, seed *uint64, issuer *string, period *uint, expirationTime *int64)
 +CreateIdentity(): *UserOtp, error
 }
 }
@@ -103,7 +143,8 @@ annotation helper {
 -getMaxSize(): *int64
 -getModifier(): *int8
 -getKey(): *string
-+ReadEnv(): *string, *uint64, *string, *uint, *int64, *int8, *string
+-getExpirationTime(): *int64
++ReadEnv(): *string, *uint64, *string, *uint, *int64, *int8, *string, *int64
 +CreateDirectory(folder string): error
 +FilenameWithoutExtension(filename string): string
 +ReadFileNamesOfDirectory(folder *string): []string
@@ -119,15 +160,17 @@ annotation http-api/common {
 +ChallengeLoginHTTP(request *Request, writer ResponseWriter): *UserOtp, error
 +ChallengeReadFileHTTP(request *Request, writer ResponseWriter): *[]byte, error
 +ChallengeWriteFileHTTP(request *Request, writer ResponseWriter, maxSize *int64): error
++ChallengeDeleteIdentity(request *Request, writer ResponseWriter): *string, error
++ChallengeDeleteFile(request *Request, writer ResponseWriter): error
 +SanitizeFileName(fileName *string)
 +SanitizeUploadFile(request *Request, maxSize *int64): string, string, File, *FileHeader, error
 }
 }
 package http-api/responder/otp-identity-responder{
 annotation http-api/responder/otp-identity-responder {
+-const Url: IdentityResponse
 -const Combination: IdentityResponse
 -const QR: IdentityResponse
--const Url: IdentityResponse
 
 +SelectResponder(mode *IdentityResponse, newUser *UserOtp, w *ResponseWriter): IdentityResponder
 }
@@ -152,6 +195,10 @@ class IdentityResponderTool {
 +HttpResponder: *ResponseWriter
 
 }
+class IdentityResponse {
+
+
+}
 class UrlResponder {
 +Tool: IdentityResponderTool
 +Send()
@@ -159,8 +206,8 @@ class UrlResponder {
 }
 package http-api/responder/otp-login-responder{
 annotation http-api/responder/otp-login-responder {
--const FileList: LoginResponse
 -const AccountInterface: LoginResponse
+-const FileList: LoginResponse
 
 +SelectResponder(mode *LoginResponse, foundID *UserOtp, w *ResponseWriter): LoginResponder
 }
@@ -174,6 +221,7 @@ class AccountInterfaceResponder {
 class AccountInterfaceTemplate {
 +UserID: string
 +Files: []string
++Password: string
 
 }
 class FileListResponder {
@@ -190,6 +238,10 @@ class LoginResponderTool {
 +HttpResponder: *ResponseWriter
 
 }
+class LoginResponse {
+
+
+}
 }
 package http-api{
 annotation http-api {
@@ -201,14 +253,17 @@ annotation http-api {
 +InitializeHTTPServer(port *string, maxSize *int64)
 }
 }
-package .{
-annotation . {
 
-
--main()
-}
-}
+"FileModifier" --> "WriteFile"
+"FileModifier" --> "ReadFile"
+"FileModifier" --> "DeleteFile"
 "Modifier" --> "FileModifier"
+"OtpModifier" --> "ReadAllIdentities"
+"OtpModifier" --> "ReadIdentity"
+"OtpModifier" --> "WriteIdentity"
+"OtpModifier" --> "DeleteIdentity"
+"OtpModifier" --> "ReadFilesOfIdentity"
+"OtpModifier" --> "InitializeOTPModifier"
 "Modifier" --> "OtpModifier"
 "IdentityResponderTool" --> "UserOtp"
 "LoginResponderTool" --> "UserOtp"
