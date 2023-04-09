@@ -21,7 +21,7 @@ func CheckAndDeleteExpiredIdentities(expirationTime *int64) error {
 			log.Println("Delete Identity:", id)
 
 			if err != nil {
-				hasError = errors.New("Deleting an Identity caused issues")
+				hasError = errors.New("deleting an Identity caused issues")
 			}
 		}
 	}

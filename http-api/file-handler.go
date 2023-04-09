@@ -16,10 +16,10 @@ func FileHandler(maxSize *int64) {
 		}
 
 		log.Println("Upload File")
-		w.WriteHeader(200)
+		w.Write([]byte("Uploaded Successfully"))
 	})
 
-	http.HandleFunc("/download", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/download/", func(w http.ResponseWriter, r *http.Request) {
 		// check if user exists and code is valid
 		foundFile, err := common.ChallengeReadFileHTTP(r, w)
 		if err != nil {
@@ -40,6 +40,6 @@ func FileHandler(maxSize *int64) {
 		}
 
 		log.Println("Delete File")
-		w.WriteHeader(200)
+		w.Write([]byte("Deleted Successfully"))
 	})
 }

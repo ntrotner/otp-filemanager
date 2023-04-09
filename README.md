@@ -45,6 +45,5 @@ When using `release/1.2` and above, there is the possibility to enable encryptio
 
 ## TODO
 - Extensive load and security tests
-- Separate (better) UI
 - Extend to other OTP methods other than TOTP
 - Implement alternative methods of saving users and files
