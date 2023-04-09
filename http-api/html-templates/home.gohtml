@@ -4,30 +4,23 @@
     <meta charset="UTF-8">
     <title>OTP File Manager</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            text-align: center;
-        }
-        button {
-            margin: 12px 0;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="/assets/materialize.min.css" /> 
+    <link rel="stylesheet" type="text/css" href="/assets/index.css" /> 
 </head>
 <body>
-
 <div>
-    <h2>Default OTP File Manager Interface</h2>
+    <h3>OTP File Manager</h3>
     <form action="/login?resp=ai" method="POST">
         <label for="user">User</label><br>
         <input type="text" id="user" name="user"><br>
         <label for="password">Password</label><br>
         <input type="password" id="password" name="password">
         <br>
-        <input type="submit" value="Login">
+        <div class="buttons">
+            <input class="btn" type="submit" value="Login">
+            <button class="btn" onclick="window.location.href = '/createIdentity?resp=cb';" type="button">Create Account</button>
+        <div>
     </form> 
-    <br>
-    <button onclick="window.location.href = '/createIdentity?resp=cb';" type="button">Create Account</button>
 </div>
-
 </body>
 </html>

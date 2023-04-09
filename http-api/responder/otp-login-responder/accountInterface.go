@@ -9,13 +9,15 @@ type AccountInterfaceResponder struct {
 }
 
 type AccountInterfaceTemplate struct {
-	UserID string
-	Files  []string
+	UserID   string
+	Files    []string
+	Password string
 }
 
 func (r AccountInterfaceResponder) Send() {
 	tmpl := template.Must(template.ParseFiles("http-api/html-templates/accountInterface.gohtml"))
-	err := tmpl.Execute(*r.Tool.HttpResponder, AccountInterfaceTemplate{UserID: r.Tool.User.Id, Files: r.Tool.Files})
+	data := AccountInterfaceTemplate{UserID: r.Tool.User.Id, Files: r.Tool.Files, Password: (*r.Tool.HttpResponder).Header().Get("Authorization")}
+	err := tmpl.Execute(*r.Tool.HttpResponder, data)
 
 	if err != nil {
 		(*r.Tool.HttpResponder).WriteHeader(500)

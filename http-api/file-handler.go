@@ -15,6 +15,7 @@ func FileHandler(maxSize *int64) {
 			return
 		}
 
+		log.Println("Upload File")
 		w.WriteHeader(200)
 	})
 

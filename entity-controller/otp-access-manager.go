@@ -77,7 +77,7 @@ func ChallengeDeleteIdentity(id *string, clientCode *string, time *time.Time) er
 		return err
 	}
 
-	err = id_manager.Modifier.OtpModifier.DeleteIdentity(&foundID.Id)
+	err = id_manager.DeleteIdentity(&foundID.Id)
 	if err != nil {
 		log.Println("Error for Delete Identity:", err)
 		return err

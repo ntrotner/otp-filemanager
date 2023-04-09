@@ -4,105 +4,137 @@
     <meta charset="UTF-8">
     <title>Account Detail</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/assets/materialize.min.css" /> 
+    <link rel="stylesheet" type="text/css" href="/assets/index.css" />
+    <script src="/assets/materialize.min.js"></script>
     <style>
-        body {
-            text-align: center;
+    body {
+        width: unset;
+        margin: 0;
+    }
+
+    .nav-wrapper .btn-flat {
+        color: white;
+    }
+
+    .nav-wrapper {
+        margin: 0 2.5rem;
+    }
+
+    .identity, .forms {
+        width: 60vw;
+        margin: 0 auto;
+    }
+
+    .upload {
+        margin-top: 2.5rem;
+    }
+
+    #status {
+
+    }
+
+    @media only screen and (max-width: 600px) {
+        .nav-wrapper {
+            margin: 0 1.5rem;
         }
 
-        .filelist ul {
-            list-style: none;
+        .identity, .forms {
+            width: 90vw;
+            margin: 0 auto;
         }
-
-        .filelist li, .filelist ul {
-            padding: 0;
-        }
-
-        .forms {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-evenly;
-        }
+    }
     </style>
 </head>
+
 <body>
-<div class="identity">
-    <h2 class="identity-title-qr">User Account</h2>
-    <p>{{.UserID}}</p>
-        <form action="/deleteIdentity" method="post">
+<nav>
+    <div class="nav-wrapper">
+        <a>User: {{.UserID}}</a>
+        <ul id="nav-mobile" class="right">
+        <li>
+            <form action="/deleteIdentity" method="post">
 
-        <div class="password">
-            <h2 class="identity-title-qr">One Time Password</h2>
+                <input class="btn-flat" type="submit" value="Delete User"/>
+                <input type="hidden" type="text" name="user" value="{{.UserID}}">
+                <input type="hidden" class="password" type="password" value="{{.Password}}" name="password">
+            </form>
+        </li>
+        </ul>
+    </div>
+</nav>
 
-            <input type="password" id="password" name="password"><br>
-        </div>
-
-        <input type="submit" value="Delete User"/>
-        <input type="hidden" type="text" id="user" name="user" value="{{.UserID}}">
-    </form>
-</div>
+<iframe name="status" id="status" style="display: none"></iframe>
 
 <div class="forms">
+    <div>
+        <h4 class="identity-title-qr">One Time Password</h4>
+
+        <input class="password" id="password" name="password" value="{{.Password}}" oninput="passwordInput(this.value)"><br>
+    </div>
+    <div class="filelist">
+        <h4 class="identity-title-qr">Files</h4>
+        <div class="input-field">
+            <select class="select" class="fileName" name="fileName" onchange="fileChange(this.value)">
+                {{range .Files}}
+                    <option value="{{.}}">{{.}}</option>
+                {{end}}
+            </select>
+        </div>
+    </div>
+
 <form action="/download" method="post">
-    <h2>Download</h2>
-    <div class="filelist">
-        <h2 class="identity-title-qr">Files</h2>
-
-        <select id="fileName" name="fileName">
-            {{range .Files}}
-                <option value="{{.}}">{{.}}</option>
-            {{end}}
-        </select>
+    <div class="buttons">
+        <input class="btn" type="submit" value="Download"/> <a download></a>
     </div>
-
-    <div class="password">
-        <h2 class="identity-title-qr">One Time Password</h2>
-
-        <input type="password" id="password" name="password"><br>
-    </div>
-
-    <input type="submit" value="Download"/> <a download></a>
-    <input type="hidden" type="text" id="user" name="user" value="{{.UserID}}">
+    <select class="fileName" name="fileName" type="hidden">
+        {{range .Files}}
+            <option value="{{.}}">{{.}}</option>
+        {{end}}
+    </select>
+    <input type="hidden" type="text" name="user" value="{{.UserID}}">
+    <input type="hidden" class="password" type="password" value="{{.Password}}" name="password">
 </form>
 
-<form action="/deleteFile" method="post">
-    <h2>Delete</h2>
-    <div class="filelist">
-        <h2 class="identity-title-qr">Files</h2>
-
-        <select id="fileName" name="fileName">
-            {{range .Files}}
-                <option value="{{.}}">{{.}}</option>
-            {{end}}
-        </select>
+<form action="/deleteFile" method="post" target="status">
+    <div class="buttons">
+        <input class="btn" type="submit" value="Delete"/>
     </div>
-
-    <div class="password">
-        <h2 class="identity-title-qr">One Time Password</h2>
-
-        <input type="password" id="password" name="password"><br>
-    </div>
-
-    <input type="submit" value="Delete"/>
-    <input type="hidden" type="text" id="user" name="user" value="{{.UserID}}">
+    <select class="fileName" name="fileName" type="hidden">
+        {{range .Files}}
+            <option value="{{.}}">{{.}}</option>
+        {{end}}
+    </select>
+    <input type="hidden" type="text" name="user" value="{{.UserID}}">
+    <input type="hidden" class="password" type="password" value="{{.Password}}" name="password">
 </form>
 
-<form action="/upload" enctype="multipart/form-data" method="post">
-    <h2>Upload</h2>
+<form class="upload" action="/upload" enctype="multipart/form-data" method="post" target="status">
+    <h4>Upload</h4>
     <div class="filelist">
-        <h2 class="identity-title-qr">File</h2>
-
         <input type="file" id="file" name="file">
     </div>
 
-    <div class="password">
-        <h2 class="identity-title-qr">One Time Password</h2>
-
-        <input type="password" id="password" name="password"><br>
+    <div class="buttons">
+        <input class="btn" type="submit" value="Upload"/>
     </div>
-
-    <input type="submit" value="Upload"/>
-    <input type="hidden" type="text" id="user" name="user" value="{{.UserID}}">
+    <input type="hidden" type="text" name="user" value="{{.UserID}}">
+    <input type="hidden" class="password" type="password" value="{{.Password}}" name="password">
 </form>
 </div>
 </body>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('.select');
+        var instances = M.FormSelect.init(elems, {});
+    });
+
+    function passwordInput(value) {
+        document.querySelectorAll('.password').forEach(node => node.setAttribute("value", value))
+    }
+
+    function fileChange(value) {
+        document.querySelectorAll('.fileName').forEach(node => {node.value = value; console.log(node);})
+    }
+</script>
 </html>
