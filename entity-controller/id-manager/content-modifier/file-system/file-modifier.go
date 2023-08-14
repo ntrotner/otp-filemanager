@@ -41,6 +41,7 @@ func ReadFile(id *string, name *string) (*[]byte, error) {
 
 func DeleteFile(id *string, fileName *string) error {
 	err := os.Remove(filepath.Join(PathToFilesOfIdentities, *id, filepath.Clean(*fileName)))
+	os.Mkdir(filepath.Join(PathToFilesOfIdentities, *id), 0666)
 	if err != nil {
 		log.Println(err)
 	}

@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <title>Account Detail</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="/assets/materialize.min.css" /> 
-    <link rel="stylesheet" type="text/css" href="/assets/index.css" />
-    <script src="/assets/materialize.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/assets/materialize.min.css" defer/> 
+    <link rel="stylesheet" type="text/css" href="/assets/index.css" defer/>
+    <script src="/assets/materialize.min.js" defer></script>
     <style>
     body {
         width: unset;
@@ -21,34 +21,21 @@
         margin: 0 2.5rem;
     }
 
-    .identity, .forms {
-        width: 60vw;
-        margin: 0 auto;
-    }
-
-    .upload {
+    .filelist {
         margin-top: 2.5rem;
     }
 
-    #status {
-        margin: 2.5rem auto;
-        height: 5rem;
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
+    .delete, .upload, .user{
+        margin: 2.5rem 0 2.5rem;
     }
 
-    #frameStatus {
-        width: 100%;
+    #status {
+        display: none;
     }
 
     @media only screen and (max-width: 600px) {
-        .nav-wrapper {
-            margin: 0 1.5rem;
-        }
-
         .identity, .forms, #status {
-            width: 90vw;
+            width: 85vw;
         }
 
         .identity, .forms {
@@ -60,24 +47,13 @@
 
 <body>
 <nav>
-    <div class="nav-wrapper">
-        <a>User: {{.UserID}}</a>
-        <ul id="nav-mobile" class="right">
-        <li>
-            <form action="/deleteIdentity" method="post">
-
-                <input class="btn-flat" type="submit" value="Delete User"/>
-                <input type="hidden" type="text" name="user" value="{{.UserID}}">
-                <input type="hidden" class="password" type="password" value="{{.Password}}" name="password">
-            </form>
-        </li>
-        </ul>
-    </div>
+    <a href="/"><h5>OTP File Manager</h5></a>
 </nav>
-
+<main>
+<h4 class="user">User: {{.UserID}}</h4>
 <div class="forms">
     <div>
-        <h4 class="identity-title-qr">One Time Password</h4>
+        <h4 class="identity-title-qr">Password</h4>
 
         <input class="password" id="password" name="password" value="{{.Password}}" oninput="passwordInput(this.value)"><br>
     </div>
@@ -105,7 +81,7 @@
     <input type="hidden" class="password" type="password" value="{{.Password}}" name="password">
 </form>
 
-<form action="/deleteFile" method="post" target="frameStatus">
+<form id="deleteFile" action="/deleteFile" method="post" target="frameStatus">
     <div class="buttons">
         <input class="btn" type="submit" value="Delete"/>
     </div>
@@ -137,12 +113,20 @@
     <input type="hidden" type="text" name="user" value="{{.UserID}}">
     <input type="hidden" class="password" type="password" value="{{.Password}}" name="password">
 </form>
+<form class="delete" action="/deleteIdentity" method="post">
+    <h4>Account Management</h4>
+    <div class="buttons">
+        <input class="btn" type="submit" value="Delete User"/>
+    </div>
+    <input type="hidden" type="text" name="user" value="{{.UserID}}">
+    <input type="hidden" class="password" type="password" value="{{.Password}}" name="password">
+</form>
 
+</div>
+</main>
 <div id="status">
     <iframe name="frameStatus" id="frameStatus"></iframe>
 </div>
-</div>
-
 </body>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -160,5 +144,7 @@
     }
 
     fileChange(document.getElementById("mainSelector").value);
+
+    document.querySelectorAll('form').forEach(form => form.addEventListener("submit", () => location.reload()))
 </script>
 </html>

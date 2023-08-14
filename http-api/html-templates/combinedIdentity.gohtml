@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <title>New OTP Identity</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="/assets/materialize.min.css" /> 
-    <link rel="stylesheet" type="text/css" href="/assets/index.css" /> 
+    <link rel="stylesheet" type="text/css" href="/assets/materialize.min.css" defer/> 
+    <link rel="stylesheet" type="text/css" href="/assets/index.css" defer/> 
     <style>
         .identity-qr {
             width: min-content;
@@ -19,6 +19,7 @@
 
         .buttons > * {
             width: 100%;
+            margin-bottom: 2.5rem;
         }
 
         .identity-ref {
@@ -27,12 +28,15 @@
     </style>
 </head>
 <body>
+<nav>
+    <a href="/"><h5>OTP File Manager</h5></a>
+</nav>
     <div class="identity-qr">
-        <h3 class="identity-title-qr">OTP Code</h3>
+        <h4 class="identity-title-qr">OTP Code</h4>
         <img width="320px" height="320px" src="data:image/png;base64,{{.Image}}" alt="Blank"/>
     </div>
     <div class="identity-url">
-        <h3 class="identity-title-url">OTP URL</h3>
+        <h4 class="identity-title-url">OTP URL</h4>
         <a class="identity-ref" href="{{.OtpUrl}}">{{.OtpUrl}}</a>
     </div>
     <div class="buttons">
