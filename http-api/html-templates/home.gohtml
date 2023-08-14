@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <title>OTP File Manager</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="/assets/materialize.min.css" /> 
-    <link rel="stylesheet" type="text/css" href="/assets/index.css" /> 
+    <link rel="stylesheet" type="text/css" href="/assets/materialize.min.css" defer/> 
+    <link rel="stylesheet" type="text/css" href="/assets/index.css" defer/> 
 </head>
 <body>
-<div>
-    <h3>OTP File Manager</h3>
+<nav>
+    <a href="/"><h5>OTP File Manager</h5></a>
+</nav>
+<main>
     <form action="/login?resp=ai" method="POST">
         <label for="user">User</label><br>
         <input type="text" id="user" name="user"><br>
@@ -21,6 +23,6 @@
             <button class="btn" onclick="window.location.href = '/createIdentity?resp=cb';" type="button">Create Account</button>
         <div>
     </form> 
-</div>
+</main>
 </body>
 </html>

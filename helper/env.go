@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"log"
 	"os"
 	"strconv"
 
@@ -89,7 +90,10 @@ func getExpirationTime() *int64 {
 
 // get required env variables for running the service
 func ReadEnv() (*string, *uint64, *string, *uint, *int64, *int8, *string, *int64) {
-	godotenv.Load(".env")
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Println("reading .env file failed: ", err)
+	}
 
 	idSeed := getIDSeed()
 	issuer := getIssuer()
