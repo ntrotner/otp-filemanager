@@ -1,0 +1,22 @@
+version: "3"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./scripts/Dockerfile
+    environment:
+      - IDSEED=13423524
+      - ISSUER=test
+      - PERIOD=120
+      - MAXFILESIZEMB=100
+      - MODIFIER=0
+      - KEY=
+      - EXPIRATIONTIME=0
+    ports:
+      - "8080:8080"
+    volumes:
+      - persistent_live_data:/usr/src/app/live-data
+
+  
+volumes:
+  persistent_live_data:

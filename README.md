@@ -4,12 +4,15 @@ A file server that allows to access files with a OTP-based authentication.
 This server offers a simple interface, but also allows it do integrate into your application through
 the endpoints, as it's stateless and relies on an up-to-date OTP.
 
+## Run in Docker
+1. Set environment variables in `docker-compose.yml`
+2. Run `docker-compose up`
+
 ## Run a Build
 1. Check branch `release/x.x`
 2. Download `otp-filemanager-x.x.tar`
 3. Set variables in `.env` (see below)
 4. Run `./otp-filemanager-x.x`
-
 
 ## Run for Development
 1. Run `./scripts/setup.sh` 
